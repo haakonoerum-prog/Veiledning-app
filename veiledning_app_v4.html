@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veiledningsmodeller – PEDD 2220</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap');
+:root {
+  --bg:#f4f0e8;--card:#fff;--ink:#1a1208;--muted:#7a6e5f;--border:#e0d9ce;
+  --c1:#1b4332;--c2:#2d6a4f;--c3:#40916c;--c4:#52b788;--c5:#74c69d;
+  --hi:#d8f3dc;--amber:#fff8e1;--ab:#f9a825;--blue:#eaf4ff;--blueb:#4895ef;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:'Source Sans 3',sans-serif;font-weight:300;min-height:100vh;}
+.app-header{background:var(--c1);color:white;padding:1.4rem 1.5rem 0.8rem;}
+.app-header h1{font-family:'Libre Baskerville',serif;font-size:clamp(1.1rem,3vw,1.6rem);font-weight:700;}
+.app-header p{font-size:0.78rem;opacity:0.65;margin-top:0.2rem;}
+.nav{background:var(--c1);padding:0 0.5rem;display:flex;overflow-x:auto;scrollbar-width:none;border-top:1px solid rgba(255,255,255,0.1);}
+.nav::-webkit-scrollbar{display:none;}
+.nav-btn{background:none;border:none;color:rgba(255,255,255,0.6);font-family:'Source Sans 3',sans-serif;font-size:0.72rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;padding:0.7rem 0.75rem;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:color 0.15s,border-color 0.15s;}
+.nav-btn:hover{color:rgba(255,255,255,0.9);}
+.nav-btn.active{color:#fff;border-bottom-color:var(--c4);}
+.section{display:none;padding:1.2rem 1rem 5rem;max-width:800px;margin:0 auto;}
+.section.active{display:block;}
+.sec-title{font-family:'Libre Baskerville',serif;font-size:1.15rem;margin-bottom:0.25rem;color:var(--c1);}
+.sec-intro{font-size:0.83rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6;}
+.src{font-size:0.7rem;color:var(--muted);font-style:italic;margin-top:1rem;border-top:1px solid var(--border);padding-top:0.6rem;}
+
+/* FISH SVG */
+.fish-seg,.tri-seg{cursor:pointer;transition:opacity 0.2s;}
+.fish-seg:hover,.tri-seg:hover{opacity:0.82;}
+.fish-seg.active,.tri-seg.active{filter:drop-shadow(0 0 5px rgba(0,0,0,0.25));}
+
+/* PHASE PANEL */
+.phase-panel{background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);overflow:hidden;margin-bottom:0.8rem;display:none;animation:fadeIn 0.2s ease;}
+.phase-panel.visible{display:block;}
+.pp-hdr{padding:0.75rem 1rem;color:white;display:flex;justify-content:space-between;align-items:center;}
+.pp-hdr h3{font-family:'Libre Baskerville',serif;font-size:0.95rem;}
+.pp-hdr button{background:none;border:none;color:rgba(255,255,255,0.8);font-size:1.1rem;cursor:pointer;}
+
+/* DRILL LIST */
+.dl{list-style:none;padding:0;}
+.di{border-bottom:1px solid #f0ede8;}
+.di:last-child{border-bottom:none;}
+.dt{width:100%;background:none;border:none;text-align:left;padding:0.6rem 1rem;font-family:'Source Sans 3',sans-serif;font-size:0.84rem;font-weight:400;color:var(--ink);cursor:pointer;display:flex;align-items:flex-start;gap:0.5rem;transition:background 0.15s;line-height:1.5;}
+.dt:hover{background:#f9f7f4;}
+.dt.open{background:#f2faf5;font-weight:600;}
+.da{flex-shrink:0;color:var(--c3);font-size:0.85rem;margin-top:0.1rem;transition:transform 0.2s;}
+.dt.open .da{transform:rotate(90deg);}
+.dd{display:none;padding:0.7rem 1rem 0.8rem 2.4rem;background:#f9fdfb;border-left:3px solid var(--c4);}
+.dd.open{display:block;animation:fadeIn 0.15s ease;}
+.dd p{font-size:0.82rem;line-height:1.65;color:#333;margin-bottom:0.5rem;}
+.dd p:last-child{margin-bottom:0;}
+.ex{background:var(--amber);border-left:3px solid var(--ab);padding:0.5rem 0.7rem;border-radius:0 4px 4px 0;font-size:0.79rem;font-style:italic;color:#555;margin-top:0.5rem;}
+.tip{background:var(--blue);border-left:3px solid var(--blueb);padding:0.5rem 0.7rem;border-radius:0 4px 4px 0;font-size:0.79rem;color:#1a3a5c;margin-top:0.5rem;}
+
+/* SUBMODAL – for methods grids etc */
+.submodal{display:none;background:white;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.1);margin-top:0.5rem;overflow:hidden;animation:fadeIn 0.2s ease;}
+.submodal.open{display:block;}
+.submodal-hdr{padding:0.6rem 1rem;font-family:'Libre Baskerville',serif;font-size:0.88rem;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
+.submodal-hdr button{background:none;border:none;font-size:1rem;cursor:pointer;color:white;opacity:0.8;}
+.submodal-body{padding:0.8rem 1rem 1rem;}
+
+/* METHOD CARDS grid */
+.mcgrid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;}
+@media(max-width:480px){.mcgrid{grid-template-columns:1fr;}}
+.mc{background:#f9f7f3;border-radius:6px;padding:0.7rem 0.8rem;cursor:pointer;border-left:3px solid var(--c4);transition:all 0.15s;}
+.mc:hover{background:var(--hi);transform:translateY(-1px);}
+.mc.sel{background:var(--hi);border-left-color:var(--c1);}
+.mc-title{font-size:0.82rem;font-weight:600;margin-bottom:0.2rem;}
+.mc-sub{font-size:0.75rem;color:var(--muted);}
+.mc-detail{background:white;border-radius:6px;padding:0.8rem;margin-top:0.6rem;border:1px solid var(--border);display:none;font-size:0.82rem;line-height:1.6;color:#333;}
+.mc-detail.open{display:block;animation:fadeIn 0.15s ease;}
+
+/* Q-TYPES */
+.qtab-row{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.7rem;}
+.qtab{padding:0.35rem 0.7rem;border:1.5px solid var(--border);border-radius:20px;background:white;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:'Source Sans 3',sans-serif;transition:all 0.15s;}
+.qtab:hover{border-color:var(--c4);background:var(--hi);}
+.qtab.active{background:var(--c2);color:white;border-color:var(--c1);}
+.qpanel{display:none;background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.qpanel.active{display:block;animation:fadeIn 0.15s ease;}
+.qpanel h4{font-family:'Libre Baskerville',serif;font-size:0.9rem;margin-bottom:0.5rem;color:var(--c1);}
+.qpanel .qdef{font-size:0.82rem;line-height:1.6;color:#444;margin-bottom:0.7rem;}
+.qex-list{list-style:none;padding:0;}
+.qex-list li{font-size:0.81rem;padding:0.3rem 0;border-bottom:1px solid #f5f2ee;color:#333;display:flex;gap:0.5rem;}
+.qex-list li:last-child{border-bottom:none;}
+.qex-list li::before{content:'«';color:var(--c3);font-weight:700;flex-shrink:0;}
+
+/* TOMM MATRIX */
+.tomm-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:0.5rem;margin-bottom:0.8rem;}
+.tomm-cell{border-radius:8px;padding:0.8rem;cursor:pointer;transition:all 0.15s;border:2px solid transparent;}
+.tomm-cell:hover{transform:translateY(-2px);}
+.tomm-cell.sel{border-color:var(--c1);}
+.tomm-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;opacity:0.8;}
+.tomm-name{font-family:'Libre Baskerville',serif;font-size:0.9rem;font-weight:700;}
+.tomm-hint{font-size:0.72rem;margin-top:0.2rem;opacity:0.8;}
+
+/* SCENARIO */
+.scenario-box{background:white;border-radius:8px;padding:1.1rem;box-shadow:0 1px 4px rgba(0,0,0,0.08);margin-bottom:0.8rem;}
+.scenario-desc{font-size:0.85rem;line-height:1.6;color:#333;padding:0.8rem;background:#f9f7f3;border-radius:6px;margin-bottom:0.8rem;border-left:3px solid var(--c3);}
+.s-opts{display:flex;flex-direction:column;gap:0.4rem;}
+.s-opt{padding:0.55rem 0.8rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;font-size:0.82rem;font-family:'Source Sans 3',sans-serif;background:#fafaf8;transition:all 0.12s;text-align:left;}
+.s-opt:hover:not(:disabled){background:var(--hi);border-color:var(--c4);}
+.s-opt.correct{background:#d8f3dc;border-color:var(--c3);color:var(--c1);font-weight:600;}
+.s-opt.wrong{background:#fde8e8;border-color:#e07070;color:#7a1212;}
+.s-opt:disabled{cursor:default;}
+.s-fb{margin-top:0.6rem;font-size:0.82rem;line-height:1.5;padding:0.5rem 0.7rem;border-radius:5px;display:none;}
+.s-fb.show{display:block;}
+.s-fb.ok{background:#d8f3dc;color:var(--c1);}
+.s-fb.no{background:#fde8e8;color:#7a1212;}
+.s-next{background:var(--c2);color:white;border:none;padding:0.5rem 1rem;border-radius:6px;font-family:'Source Sans 3',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;margin-top:0.5rem;display:none;}
+.s-next.show{display:inline-block;}
+.scenario-prog{font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem;}
+
+/* PALLET */
+.pallet-row{display:flex;gap:0;overflow-x:auto;padding-bottom:0.4rem;}
+.pstep{flex:0 0 auto;width:88px;background:#f4f0e8;border:2px solid transparent;border-radius:8px;padding:0.65rem 0.4rem;text-align:center;cursor:pointer;transition:all 0.15s;margin-right:0.35rem;position:relative;}
+.pstep:not(:last-child)::after{content:'›';position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:1rem;}
+.pstep:hover{transform:translateY(-2px);}
+.pstep.active{background:var(--c2);color:white;border-color:var(--c1);}
+.pl{font-family:'Libre Baskerville',serif;font-size:1.5rem;font-weight:700;line-height:1;}
+.pp{font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;margin-top:0.2rem;opacity:0.8;}
+.pstep.active .pp{opacity:1;}
+.pallet-panel{margin-top:0.8rem;background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.07);overflow:hidden;display:none;}
+.pallet-panel.visible{display:block;animation:fadeIn 0.2s ease;}
+.pp-dhdr{padding:0.65rem 1rem;background:var(--c2);color:white;}
+.pp-dhdr h3{font-family:'Libre Baskerville',serif;font-size:0.9rem;}
+
+/* CARE grid */
+.care-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
+@media(max-width:420px){.care-grid{grid-template-columns:1fr;}}
+.care-card{background:white;border-radius:8px;padding:0.9rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);border-left:4px solid transparent;}
+.care-letter{font-family:'Libre Baskerville',serif;font-size:1.8rem;font-weight:700;line-height:1;}
+.care-word{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin:0.1rem 0 0.5rem;}
+
+/* SYM */
+.sym-toggle{display:flex;gap:0.5rem;margin-bottom:0.8rem;}
+.sym-btn{flex:1;padding:0.6rem;border:2px solid var(--border);background:white;border-radius:6px;cursor:pointer;font-family:'Source Sans 3',sans-serif;font-size:0.8rem;font-weight:600;transition:all 0.15s;}
+.sym-btn.active{background:var(--c2);color:white;border-color:var(--c1);}
+.sym-panel{display:none;background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.sym-panel.visible{display:block;}
+.sym-panel h3{font-family:'Libre Baskerville',serif;font-size:0.95rem;margin-bottom:0.7rem;}
+
+/* QUIZ */
+.quiz-q{background:white;border-radius:8px;padding:1rem 1.1rem;margin-bottom:0.7rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.qt{font-size:0.88rem;font-weight:600;margin-bottom:0.65rem;line-height:1.5;}
+.qopts{display:flex;flex-direction:column;gap:0.35rem;}
+.qopt{padding:0.5rem 0.75rem;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;font-size:0.81rem;font-family:'Source Sans 3',sans-serif;background:#fafaf8;transition:all 0.12s;text-align:left;}
+.qopt:hover:not(:disabled){background:var(--hi);border-color:var(--c4);}
+.qopt.correct{background:#d8f3dc;border-color:var(--c3);color:var(--c1);font-weight:600;}
+.qopt.wrong{background:#fde8e8;border-color:#e07070;color:#7a1212;}
+.qopt:disabled{cursor:default;}
+.qfb{margin-top:0.55rem;font-size:0.8rem;line-height:1.5;padding:0.45rem 0.65rem;border-radius:5px;display:none;}
+.qfb.show{display:block;}
+.qfb.ok{background:#d8f3dc;color:var(--c1);}
+.qfb.no{background:#fde8e8;color:#7a1212;}
+.quiz-reset{background:var(--c2);color:white;border:none;padding:0.55rem 1.1rem;border-radius:6px;font-family:'Source Sans 3',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;margin-top:0.5rem;display:none;}
+.quiz-reset.show{display:inline-block;}
+
+/* GCARD */
+.gcard{background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:0.6rem;border-left:4px solid var(--c3);overflow:hidden;}
+.gcard-head{padding:0.75rem 1rem;cursor:pointer;display:flex;align-items:center;gap:0.6rem;}
+.gcard-head:hover{background:#faf8f5;}
+.gcd{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.gct{font-family:'Libre Baskerville',serif;font-size:0.88rem;font-weight:700;flex:1;}
+.gca{color:var(--muted);font-size:0.8rem;transition:transform 0.2s;}
+.gcard.open .gca{transform:rotate(90deg);}
+.gcb{display:none;padding:0 1rem 0.9rem;font-size:0.83rem;line-height:1.65;color:#333;}
+.gcard.open .gcb{display:block;}
+
+/* REFLECT STAIRCASE */
+.stair{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.8rem;}
+.stair-step{border-radius:8px;padding:0.75rem 1rem;cursor:pointer;transition:all 0.15s;border:2px solid transparent;}
+.stair-step:hover{transform:translateX(4px);}
+.stair-step.sel{border-color:rgba(0,0,0,0.2);}
+.ss-num{font-family:'Libre Baskerville',serif;font-size:1.2rem;font-weight:700;float:left;margin-right:0.6rem;line-height:1.2;}
+.ss-name{font-size:0.88rem;font-weight:700;}
+.ss-hint{font-size:0.75rem;margin-top:0.1rem;opacity:0.85;}
+.stair-detail{clear:both;display:none;margin-top:0.7rem;padding-top:0.6rem;border-top:1px solid rgba(255,255,255,0.3);}
+.stair-step.sel .stair-detail{display:block;}
+.stair-detail p{font-size:0.82rem;line-height:1.6;margin-bottom:0.4rem;}
+.stair-detail ul{list-style:none;padding:0;}
+.stair-detail ul li{font-size:0.8rem;padding:0.2rem 0;display:flex;gap:0.4rem;}
+.stair-detail ul li::before{content:'›';flex-shrink:0;}
+
+/* GROUP PHASES */
+.gphase-row{display:flex;gap:0.4rem;overflow-x:auto;padding-bottom:0.4rem;margin-bottom:0.8rem;}
+.gphase-btn{flex:0 0 auto;padding:0.5rem 0.9rem;border:2px solid var(--border);background:white;border-radius:20px;cursor:pointer;font-size:0.75rem;font-weight:600;font-family:'Source Sans 3',sans-serif;white-space:nowrap;transition:all 0.15s;}
+.gphase-btn:hover{border-color:var(--c4);}
+.gphase-btn.active{background:var(--c2);color:white;border-color:var(--c1);}
+.gphase-panel{display:none;background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.gphase-panel.active{display:block;animation:fadeIn 0.2s ease;}
+.gphase-panel h3{font-family:'Libre Baskerville',serif;font-size:0.95rem;margin-bottom:0.6rem;}
+
+/* COMPARE */
+.compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;}
+@media(max-width:500px){.compare-wrap{grid-template-columns:1fr;}}
+.compare-col h4{font-family:'Libre Baskerville',serif;font-size:0.88rem;margin-bottom:0.5rem;padding:0.5rem 0.7rem;border-radius:6px;color:white;}
+.cmp-row{display:flex;gap:0.4rem;margin-bottom:0.4rem;}
+.cmp-cell{flex:1;background:#f9f7f3;border-radius:5px;padding:0.5rem 0.6rem;font-size:0.78rem;line-height:1.45;color:#333;border-left:3px solid var(--border);}
+.cmp-cell.match{border-left-color:var(--c4);}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<div class="app-header">
+  <h1>Veiledningsmodeller</h1>
+  <p>Interaktivt læringsverktøy — PEDD 2220</p>
+</div>
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSec('fisk',this)">Fiskefiguren</button>
+  <button class="nav-btn" onclick="showSec('trekant',this)">Praksistrekanten</button>
+  <button class="nav-btn" onclick="showSec('pallet',this)">PALLET</button>
+  <button class="nav-btn" onclick="showSec('care',this)">CARE/SOLER</button>
+  <button class="nav-btn" onclick="showSec('sporsmal',this)">Spørsmål</button>
+  <button class="nav-btn" onclick="showSec('refleksjon',this)">Refleksjon</button>
+  <button class="nav-btn" onclick="showSec('gruppe',this)">Grupper</button>
+  <button class="nav-btn" onclick="showSec('sym',this)">Symmetri</button>
+  <button class="nav-btn" onclick="showSec('sammenlign',this)">Sammenlign</button>
+  <button class="nav-btn" onclick="showSec('scenario',this)">Scenario</button>
+  <button class="nav-btn" onclick="showSec('indgrupp',this)">Ind. vs. gruppe</button><button class="nav-btn" onclick="showSec('tradisjoner',this)">Tradisjoner</button><button class="nav-btn" onclick="showSec('konflikt',this)">Konflikt</button><button class="nav-btn" onclick="showSec('quiz',this)">Quiz</button>
+</nav>
+
+<!-- ═══════════════ FISKEFIGUREN ═══════════════ -->
+<div id="sec-fisk" class="section active">
+  <h2 class="sec-title">Fiskefiguren</h2>
+  <p class="sec-intro">Klikk en fase → klikk et punkt → klikk videre for dypere innhold og konkrete metoder.</p>
+  <div style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);padding:1rem;margin-bottom:0.8rem;">
+    <svg viewBox="0 0 700 200" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">
+      <g class="fish-seg" data-f="1" onclick="selFish(1)"><polygon points="20,100 90,60 90,140" fill="#1b4332" opacity="0.92"/>
+        <text x="38" y="97" fill="white" font-size="8" font-family="serif" font-weight="bold" text-anchor="middle">Plan-</text>
+        <text x="38" y="109" fill="white" font-size="8" font-family="serif" font-weight="bold" text-anchor="middle">legging</text></g>
+      <g class="fish-seg" data-f="2" onclick="selFish(2)"><path d="M90,60 Q130,40 200,55 L200,145 Q130,160 90,140 Z" fill="#2d6a4f" opacity="0.92"/>
+        <text x="145" y="97" fill="white" font-size="8.5" font-family="serif" font-weight="bold" text-anchor="middle">Oppstart /</text>
+        <text x="145" y="109" fill="white" font-size="8.5" font-family="serif" font-weight="bold" text-anchor="middle">bli kjent</text></g>
+      <g class="fish-seg" data-f="3" onclick="selFish(3)"><path d="M200,55 Q320,20 490,35 L490,165 Q320,180 200,145 Z" fill="#40916c" opacity="0.92"/>
+        <text x="345" y="97" fill="white" font-size="10" font-family="serif" font-weight="bold" text-anchor="middle">Arbeidsfasen</text>
+        <text x="345" y="112" fill="white" font-size="8.5" font-family="serif" text-anchor="middle">(veiledningens kjerne)</text></g>
+      <g class="fish-seg" data-f="4" onclick="selFish(4)"><path d="M490,35 Q570,25 630,55 L650,100 L630,145 Q570,175 490,165 Z" fill="#52b788" opacity="0.92"/>
+        <text x="568" y="97" fill="white" font-size="8.5" font-family="serif" font-weight="bold" text-anchor="middle">Avslutning</text></g>
+      <circle cx="620" cy="82" r="7" fill="white" opacity="0.7"/><circle cx="621" cy="82" r="3.5" fill="#1b4332"/>
+      <line x1="20" y1="185" x2="680" y2="185" stroke="#bbb" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="350" y="198" fill="#aaa" font-size="9" text-anchor="middle" font-style="italic">tid</text>
+      <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#bbb"/></marker></defs>
+    </svg>
+  </div>
+  <div class="phase-panel" id="fish-panel">
+    <div class="pp-hdr" id="fish-hdr"><h3 id="fish-title"></h3><button onclick="closeFish()">✕</button></div>
+    <ul class="dl" id="fish-drill"></ul>
+    <p class="src" style="padding:0 1rem 0.8rem;">Tveiten (2019). <em>Veiledning – mer enn ord</em> (5. utg.).</p>
+  </div>
+  <p style="font-size:0.75rem;color:var(--muted);text-align:center;">Klikk fase → punkt → les mer eller utforsk metoder</p>
+</div>
+
+<!-- ═══════════════ PRAKSISTREKANTEN ═══════════════ -->
+<div id="sec-trekant" class="section">
+  <h2 class="sec-title">Praksistrekanten</h2>
+  <p class="sec-intro">Handal &amp; Lauvås sin modell. Klikk nivå → punkt → dypere innhold.</p>
+  <div style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);padding:1rem;margin-bottom:0.8rem;">
+    <svg viewBox="0 0 460 320" style="width:100%;max-width:440px;display:block;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
+      <g class="tri-seg" data-t="3" onclick="selTri(3)"><polygon points="230,20 100,200 360,200" fill="#1b4332" opacity="0.9"/>
+        <text x="230" y="108" fill="white" font-size="13" font-family="serif" font-weight="bold" text-anchor="middle">P3</text>
+        <text x="230" y="126" fill="white" font-size="9.5" font-family="serif" text-anchor="middle">Verdier &amp; etikk</text></g>
+      <g class="tri-seg" data-t="2" onclick="selTri(2)"><polygon points="100,200 360,200 410,270 50,270" fill="#40916c" opacity="0.9"/>
+        <text x="230" y="242" fill="white" font-size="13" font-family="serif" font-weight="bold" text-anchor="middle">P2</text>
+        <text x="230" y="258" fill="white" font-size="9" font-family="serif" text-anchor="middle">Kunnskap &amp; erfaringer</text></g>
+      <g class="tri-seg" data-t="1" onclick="selTri(1)"><polygon points="50,270 410,270 440,310 20,310" fill="#52b788" opacity="0.9"/>
+        <text x="230" y="296" fill="white" font-size="12" font-family="serif" font-weight="bold" text-anchor="middle">P1 — Handlinger (praksis)</text></g>
+      <text x="8" y="295" fill="#999" font-size="8">Synlig</text>
+      <text x="8" y="135" fill="#999" font-size="8">Skjult</text>
+      <line x1="15" y1="270" x2="15" y2="20" stroke="#ccc" stroke-width="1" stroke-dasharray="3,3"/>
+    </svg>
+  </div>
+  <div class="phase-panel" id="tri-panel">
+    <div class="pp-hdr" id="tri-hdr"><h3 id="tri-title"></h3><button onclick="closeTri()">✕</button></div>
+    <ul class="dl" id="tri-drill"></ul>
+    <p class="src" style="padding:0 1rem 0.8rem;">Lauvås &amp; Handal (2014), i Handal, Hofgaard &amp; Lauvås (2016).</p>
+  </div>
+</div>
+
+<!-- ═══════════════ PALLET ═══════════════ -->
+<div id="sec-pallet" class="section">
+  <h2 class="sec-title">PALLET-modellen</h2>
+  <p class="sec-intro">Pettersen &amp; Løkkes strukturmodell. Klikk bokstav → punkt → dypere innhold.</p>
+  <div style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);padding:1rem;margin-bottom:0.8rem;">
+    <div class="pallet-row">
+      <div class="pstep" data-p="P" onclick="selPallet('P')"><div class="pl">P</div><div class="pp">Problem</div></div>
+      <div class="pstep" data-p="A" onclick="selPallet('A')"><div class="pl">A</div><div class="pp">Analyse</div></div>
+      <div class="pstep" data-p="L1" onclick="selPallet('L1')"><div class="pl">L¹</div><div class="pp">dV løsn.</div></div>
+      <div class="pstep" data-p="L2" onclick="selPallet('L2')"><div class="pl">L²</div><div class="pp">V løsn.</div></div>
+      <div class="pstep" data-p="E" onclick="selPallet('E')"><div class="pl">E</div><div class="pp">Eval.</div></div>
+      <div class="pstep" data-p="T" onclick="selPallet('T')"><div class="pl">T</div><div class="pp">Tiltak</div></div>
+    </div>
+    <div class="pallet-panel" id="pallet-panel">
+      <div class="pp-dhdr"><h3 id="pallet-title"></h3></div>
+      <ul class="dl" id="pallet-drill"></ul>
+    </div>
+  </div>
+  <p class="src">Pettersen &amp; Løkke (2017). <em>Veiledning i praksis</em> (2. utg.). Basert på Bachke (1997, 2002).</p>
+</div>
+
+<!-- ═══════════════ CARE / SOLER ═══════════════ -->
+<div id="sec-care" class="section">
+  <h2 class="sec-title">CARE – veilederens grunnholdning</h2>
+  <p class="sec-intro">C-en spiller førstefiolin. Klikk på underpunktene i hvert kort for mer.</p>
+  <div class="care-grid" style="margin-bottom:1rem;" id="care-grid"></div>
+  <h2 class="sec-title" style="margin-top:1.2rem;">SOLER – nonverbal tilstedeværelse</h2>
+  <p class="sec-intro" style="margin-bottom:0.7rem;">Støtter CARE-holdningene gjennom kropp og øyekontakt.</p>
+  <ul class="dl" style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.07);" id="soler-list"></ul>
+  <p class="src">Pettersen &amp; Løkke (2017). <em>Veiledning i praksis</em> (2. utg.).</p>
+</div>
+
+<!-- ═══════════════ SPØRSMÅL ═══════════════ -->
+<div id="sec-sporsmal" class="section">
+  <h2 class="sec-title">Spørsmålsbibliotek</h2>
+  <p class="sec-intro">Klikk en kategori for å se definisjon, hensikt og eksempelspørsmål.</p>
+  <div class="qtab-row" id="qtabs"></div>
+  <div id="qpanels"></div>
+  <div style="margin-top:1.2rem;">
+    <h2 class="sec-title">Tomms spørsmålsmatrise</h2>
+    <p class="sec-intro" style="margin-bottom:0.8rem;">Karl Tomm (1989) deler spørsmål i fire typer etter paradigme og hensikt. Klikk et felt.</p>
+    <div style="font-size:0.75rem;color:var(--muted);display:grid;grid-template-columns:1fr 1fr;text-align:center;margin-bottom:0.3rem;">
+      <span>Orienterende hensikt</span><span>Påvirkende hensikt</span>
+    </div>
+    <div class="tomm-grid" id="tomm-grid"></div>
+    <div id="tomm-detail" style="display:none;background:white;border-radius:8px;padding:1rem;box-shadow:0 1px 4px rgba(0,0,0,0.08);animation:fadeIn 0.2s ease;">
+      <h4 id="tomm-title" style="font-family:'Libre Baskerville',serif;font-size:0.95rem;margin-bottom:0.5rem;"></h4>
+      <p id="tomm-def" style="font-size:0.82rem;line-height:1.6;color:#444;margin-bottom:0.7rem;"></p>
+      <ul class="qex-list" id="tomm-exlist"></ul>
+    </div>
+  </div>
+  <p class="src">Pettersen &amp; Løkke (2017); Jensen &amp; Ulleberg (2019); Tveiten (2019).</p>
+</div>
+
+<!-- ═══════════════ REFLEKSJON ═══════════════ -->
+<div id="sec-refleksjon" class="section">
+  <h2 class="sec-title">Refleksjonsnivåer</h2>
+  <p class="sec-intro">Tveiten (2019) beskriver fire nivåer av refleksjon. Klikk et nivå for å se spørsmål og eksempel.</p>
+  <div class="stair" id="stair-cont"></div>
+  <p class="src">Tveiten (2019). <em>Veiledning – mer enn ord</em> (5. utg.).</p>
+</div>
+
+<!-- ═══════════════ GRUPPER ═══════════════ -->
+<div id="sec-gruppe" class="section">
+  <h2 class="sec-title">Gruppeutvikling og veilederens funksjon</h2>
+  <p class="sec-intro">Klikk en fase for å lese om hva som kjennetegner den og hva veilederen gjør.</p>
+  <div class="gphase-row" id="gphase-btns"></div>
+  <div id="gphase-panels"></div>
+  <div style="margin-top:1.4rem;">
+    <h2 class="sec-title">Veilederens fire funksjoner</h2>
+    <p class="sec-intro" style="margin-bottom:0.8rem;">Pettersen &amp; Løkke (2017) beskriver fire kategorier av det veilederen gjør. Klikk for detaljer og eksempler.</p>
+    <div id="vfunk-cards"></div>
+  </div>
+  <p class="src">Killen (2007); Pettersen &amp; Løkke (2017); Tveiten (2019).</p>
+</div>
+
+<!-- ═══════════════ SYMMETRI ═══════════════ -->
+<div id="sec-sym" class="section">
+  <h2 class="sec-title">Symmetri og komplementaritet</h2>
+  <p class="sec-intro">Jensen &amp; Ulleberg bruker Batesons begreper om samspillsmønstre.</p>
+  <div class="sym-toggle">
+    <button class="sym-btn active" onclick="showSym('s',this)">Symmetrisk</button>
+    <button class="sym-btn" onclick="showSym('k',this)">Komplementært</button>
+  </div>
+  <div class="sym-panel visible" id="sp-s">
+    <h3>Symmetrisk samspill</h3>
+    <ul class="dl" id="sym-s-list"></ul>
+  </div>
+  <div class="sym-panel" id="sp-k">
+    <h3>Komplementært samspill</h3>
+    <ul class="dl" id="sym-k-list"></ul>
+  </div>
+  <p class="src">Jensen &amp; Ulleberg (2019). <em>Mellom ordene</em>. / Killen (2007).</p>
+</div>
+
+<!-- ═══════════════ SAMMENLIGN ═══════════════ -->
+<div id="sec-sammenlign" class="section">
+  <h2 class="sec-title">Sammenlign: Fiskefiguren vs. PALLET</h2>
+  <p class="sec-intro">Begge modellene strukturerer veiledningssamtalen i faser. Se her hvordan de svarer til hverandre.</p>
+  <div class="compare-wrap" id="compare-wrap"></div>
+  <p class="src">Tveiten (2019); Pettersen &amp; Løkke (2017).</p>
+</div>
+
+<!-- ═══════════════ SCENARIO ═══════════════ -->
+<div id="sec-scenario" class="section">
+  <h2 class="sec-title">Scenarioøvelse</h2>
+  <p class="sec-intro">Les situasjonsbeskrivelsen og velg hvilken metode, spørsmålstype eller tilnærming som passer best. Øver deg på å anvende teorien.</p>
+  <div class="scenario-prog" id="sc-prog"></div>
+  <div class="scenario-box" id="sc-box"></div>
+  <button class="s-next" id="sc-next" onclick="nextScenario()">Neste scenario →</button>
+</div>
+
+<!-- ═══════════════ QUIZ ═══════════════ -->
+<div id="sec-quiz" class="section">
+  <h2 class="sec-title">Quiz</h2>
+  <p class="sec-intro">Test deg selv på alle modellene.</p>
+  <div id="quiz-cont"></div>
+  <button class="quiz-reset" id="qreset" onclick="buildQ()">Start på nytt</button>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────
+// NAV
+// ─────────────────────────────────────────────────────
+function showSec(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────
+// DRILL TOGGLE
+// ─────────────────────────────────────────────────────
+function toggleDrill(btn) {
+  const deep = btn.nextElementSibling;
+  const isOpen = deep.classList.contains('open');
+  btn.closest('.dl').querySelectorAll('.dd.open').forEach(d => { d.classList.remove('open'); d.previousElementSibling.classList.remove('open'); });
+  if (!isOpen) { deep.classList.add('open'); btn.classList.add('open'); }
+}
+function toggleG(h) { h.closest('.gcard').classList.toggle('open'); }
+
+// ─────────────────────────────────────────────────────
+// BUILD DRILL LIST HTML
+// ─────────────────────────────────────────────────────
+function buildDrill(items) {
+  return items.map(it => {
+    let extra = '';
+    if (it.sub) extra += `<div style="margin-top:0.6rem;">${it.sub}</div>`;
+    if (it.ex) extra += `<div class="ex">${it.ex}</div>`;
+    if (it.tip) extra += `<div class="tip">${it.tip}</div>`;
+    return `<li class="di"><button class="dt" onclick="toggleDrill(this)"><span class="da">›</span>${it.label}</button><div class="dd"><p>${it.deep}</p>${extra}</div></li>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────────────
+// FISKEFIGUREN DATA
+// ─────────────────────────────────────────────────────
+const fishData = {
+  1: { title: 'Planleggingsfasen', color: '#1b4332', items: [
+    { label: 'Hvem definerer behovet?', deep: 'Behovet kan komme fra yrkesutøverne selv, lederen eller utdanningsinstitusjonen. Hvem som definerer behovet har konsekvenser for motivasjon og frivillighet. Dersom lederen definerer behovet, kan motivasjonen hos de ansatte være lav (Tveiten, 2019).',
+      ex: 'Eksempel: En leder bestiller veiledning for sine ansatte. Da er det særlig viktig å tematisere hva veiledning er og ikke er – og å avlive myter som «veiledning er kos med misnøye» eller «veiledning er terapi».' },
+    { label: 'Frivillighet og autonomi', deep: 'Frivillighet er en sentral verdi i veiledning (Tveiten, 2019). Forandringsprosesser er mest hensiktsmessige dersom de baseres på frivillighet. At veiledning er frivillig betyr likevel ikke at motivering ikke kan skje aktivt og bevisst.',
+      tip: 'Tveiten (2019): Motivering kan handle om å avlive myter – «veiledning er terapi», «det er bare for damer», «det er kos med misnøye».' },
+    { label: 'Praktiske avklaringer', deep: 'Planleggingsspørsmål: Hvem veileder? Hvilke kvalifikasjoner trengs? Én eller to veiledere? Hva er hensikten? Hvor lenge varer prosessen? Hvem deltar? Planlegging er nødvendig for at veiledning ikke spises opp av daglige gjøremål.' },
+    { label: 'Planlegging skaper trygghet', deep: 'Fast tidspunkt, definert varighet, fast sted, faste deltakere og obligatorisk fremmøte skaper rammer som muliggjør konsentrasjon om veiledningen. Strukturen gir paradoksalt nok rom for utrygghet – som er nødvendig for erkjennelse og forandring (Tveiten, 2019).' }
+  ]},
+  2: { title: 'Oppstart / bli-kjent / kontraktfase', color: '#2d6a4f', items: [
+    { label: 'Hensikten med innsjekk og bli-kjent', deep: 'Hensikten er å lede oppmerksomheten mot veiledningen og å få informasjon om deltakerne slik at man kan møte dem der de er. Runder og metoder for innsjekk bidrar til en god oppstart (Tveiten, 2019).',
+      sub: `<div style="margin-top:0.5rem;font-size:0.8rem;font-weight:600;color:var(--c1);margin-bottom:0.3rem;">Konkrete bli-kjent-metoder (klikk):</div>
+<div class="mcgrid" id="bk-grid">
+  <div class="mc" onclick="selMc(this,'bk1')"><div class="mc-title">Vesken-metoden</div><div class="mc-sub">Gruppen, oppstart</div></div>
+  <div class="mc" onclick="selMc(this,'bk2')"><div class="mc-title">Inspirasjonsfortelling</div><div class="mc-sub">Par og gruppe</div></div>
+  <div class="mc" onclick="selMc(this,'bk3')"><div class="mc-title">Suksesshistorie</div><div class="mc-sub">Gruppe, første runde</div></div>
+  <div class="mc" onclick="selMc(this,'bk4')"><div class="mc-title">Prospektkort</div><div class="mc-sub">Individuell og gruppe</div></div>
+  <div class="mc" onclick="selMc(this,'bk5')"><div class="mc-title">Ordassosiasjoner</div><div class="mc-sub">Gruppe, ring</div></div>
+  <div class="mc" onclick="selMc(this,'bk6')"><div class="mc-title">Helt i livet</div><div class="mc-sub">Gruppe</div></div>
+</div>
+<div class="mc-detail" id="bk1">Alle tar frem én ting fra vesken sin og sier noen setninger om hva denne tingen betyr for dem. Erfaring viser at dette kan fremkalle latter og humor og skaper god stemning. Passer i grupper.</div>
+<div class="mc-detail" id="bk2">To og to deler en inspirasjonsfortelling fra jobb de siste to ukene. Til slutt forteller hvert par hva de har oppdaget om seg selv og sin partner. Personlige opplysninger huskes lettere enn faktaopplysninger.</div>
+<div class="mc-detail" id="bk3">På den første runden inviteres alle til å fortelle en suksesshistorie fra jobben sin. Skaper trygghet og positiv stemning fra start. Passer også i individuell veiledning.</div>
+<div class="mc-detail" id="bk4">Alle tar to prospektkort som de mener sier noe om hvem de er. På runden forteller hver enkelt hva kortet symboliserer av egne personlige egenskaper. Passer både individuelt og i gruppe.</div>
+<div class="mc-detail" id="bk5">Alle står i ring. Én sier et ord (substantiv/verb). Sidemannen sier to ord vedkommende assosierer til det. Neste sier tre ord osv. Avsluttes med refleksjon over hva man oppdaget.</div>
+<div class="mc-detail" id="bk6">Alle forteller om en helt i livet sitt og hva som gjør denne personen til en helt. Avslørende og personlig – skaper gjenkjennelse og fellesskap.</div>` },
+    { label: 'Veiledningskontrakten', deep: 'Kontrakten konkretiserer hensikten og rammene. Den kan inneholde: mål for den enkelte, samspillregler (taushetsplikt, mobiltelefon, fravær), ansvarsfordeling, dokumentasjonsformer og konsekvenser av kontraktbrudd.',
+      ex: 'Eksempelinnhold: «Disse målområdene vil jeg arbeide med (kognitive, affektive, handlingsrepertoar). Jeg forplikter meg til… Jeg forventer at veilederen…»' },
+    { label: 'Avklaring av forventninger', deep: 'Deltakernes forventninger til veilederen og hverandre, og veilederens forventninger til deltakerne, tematiseres eksplisitt. Slik avklaring legger grunnlaget for samarbeidet og har stor betydning for kvaliteten på veiledningen (Tveiten, 2019).' },
+    { label: 'Trygghet – forutsetning for refleksjon', deep: 'Trygghet er en nødvendig, men ikke tilstrekkelig forutsetning for god veiledning. Normene fra kontrakten skaper rammene. Strukturen skaper paradoksalt nok rom for utrygghet – som er nødvendig for genuin refleksjon (Tveiten, 2019).' }
+  ]},
+  3: { title: 'Arbeidsfasen', color: '#40916c', items: [
+    { label: 'Hva skjer i arbeidsfasen?', deep: 'Arbeidsfasen er lengst rent tidsmessig. Fokuspersonen bringer erfaringer og utfordringer fra praksis. Veilederen legger til rette for refleksjon gjennom dialog og spørsmål – uten å gi råd i tradisjonell forstand. Innholdet er sjelden planlagt på forhånd (Tveiten, 2019).',
+      sub: `<div style="margin-top:0.5rem;font-size:0.8rem;font-weight:600;color:var(--c1);margin-bottom:0.3rem;">Spørsmålstyper i arbeidsfasen (klikk):</div>
+<div class="mcgrid">
+  <div class="mc" onclick="selMc(this,'aq1')"><div class="mc-title">Åpne spørsmål</div><div class="mc-sub">Hva, hvordan, hvilke</div></div>
+  <div class="mc" onclick="selMc(this,'aq2')"><div class="mc-title">Effektspørsmål</div><div class="mc-sub">Fremtidsrettet</div></div>
+  <div class="mc" onclick="selMc(this,'aq3')"><div class="mc-title">Skaleringsspørsmål</div><div class="mc-sub">Grad og motivasjon</div></div>
+  <div class="mc" onclick="selMc(this,'aq4')"><div class="mc-title">Mirakelspørsmål</div><div class="mc-sub">LØFT – hypotetisk</div></div>
+  <div class="mc" onclick="selMc(this,'aq5')"><div class="mc-title">Unntaksspørsmål</div><div class="mc-sub">LØFT – ressurser</div></div>
+  <div class="mc" onclick="selMc(this,'aq6')"><div class="mc-title">Refleksive spørsmål</div><div class="mc-sub">Tomm – nye muligheter</div></div>
+</div>
+<div class="mc-detail" id="aq1">Åpne spørsmål begynner med hva, hvordan, hvilke. De gir fokuspersonen rom til å fortelle fritt. Eksempler: «Hva skjedde?» / «Hvordan opplevde du det?» / «Hvilke tanker gjør du deg om dette?»</div>
+<div class="mc-detail" id="aq2">Effektspørsmål hjelper fokuspersonen å oppdage konsekvenser av valg. Eksempler: «Hva vil du gjøre hvis du opplever noe liknende neste gang?» / «Hvordan tror du dette vil påvirke deg fremover?»</div>
+<div class="mc-detail" id="aq3">Skaleringsspørsmål kartlegger grad og motivasjon. Eksempler: «På en skala fra 1–10, hvor viktig er dette for deg?» / «Hvor vil du plassere deg i dag?» / «Hva skal til for å komme ett steg høyere?»</div>
+<div class="mc-detail" id="aq4">Mirakelspørsmål: «Tenk deg at du legger deg i kveld og mens du sover skjer det et mirakel – problemene er borte. Hva ville vært det første lille tegnet i morgen tidlig på at mirakelet har skjedd?»</div>
+<div class="mc-detail" id="aq5">Unntaksspørsmål: «Kan du huske en gang problemet var mindre – eller ikke et problem i det hele tatt?» / «Hva var annerledes da?» / «Hvordan klarte du det?» Søker etter det som fungerer.</div>
+<div class="mc-detail" id="aq6">Refleksive spørsmål (Tomm): «Hva tror du hadde skjedd hvis du gjorde noe helt nytt?» / «Hvordan kan dette problemet være en løsning på noe?» Åpner for nye forståelsesmåter uten å gi svar.</div>` },
+    { label: 'Situasjonsanalyse', deep: 'Analyse av en erfart hendelse via praksisteorien: handlinger (P1) → kunnskap (P2) → verdier/følelser (P3). Veilederen spør systematisk. Fokuspersonen oppdager grunnlaget for egne handlinger – inkludert taus kunnskap (Tveiten, 2019).',
+      ex: 'Marit, sykepleier, trodde hun hadde gjort en dårlig jobb. Gjennom situasjonsanalyse oppdaget hun ubevisste handlinger, taus kunnskap og egne verdier – og gikk fra dårlig samvittighet til økt faglig selvtillit.' },
+    { label: 'Taus kunnskap og bevisstgjøring', deep: 'Taus kunnskap (Polanyi) er kunnskap integrert i personen som brukes uten at man er klar over det – lettere gjort enn sagt. Veiledning legger til rette for at slik kunnskap begrepssettes gjennom refleksjon over praksis (Tveiten, 2019).' },
+    { label: 'Refleksjonsnivåer som metode', deep: 'I arbeidsfasen kan veilederen strukturere refleksjonen i fire nivåer: deskriptiv → dialogisk → kritisk → etisk. Se fanen «Refleksjon» for fullstendig oversikt med spørsmål og eksempel.' }
+  ]},
+  4: { title: 'Avslutningsfasen', color: '#52b788', items: [
+    { label: 'Hensikten med avslutningen', deep: 'Tre formål: (1) evaluere veiledningen, (2) avslutte prosessen, (3) legge til rette for videreføring. Oppsummering av refleksjoner og oppdagelser er sentralt – hva tar fokuspersonen med seg? (Tveiten, 2019).' },
+    { label: 'Evalueringsspørsmål', deep: 'Veilederen kan bruke: Hvilke mål hadde du da veiledningen startet? Har veiledningen bidratt til at du nådde dem? Hva har vært positivt? Hva kunne vært annerledes? Hva har du oppdaget ved deg selv som fagperson? Hva trenger du nå?' },
+    { label: 'Sorgreaksjonen – å miste fristedet', deep: 'Mange opplever veiledningsgruppen som et fristed der man kan være åpen om styrker og svakheter. Når veiledningen avsluttes, kan noen oppleve ensomhet eller sorg. Veilederen bør legge til rette for bearbeiding av dette (Tveiten, 2019).' },
+    { label: 'Neste time starter her', deep: 'Avslutningsfasen i én time henger sammen med oppstarten av neste. Det er hensiktsmessig å starte neste veiledningstime med en oppsummering av refleksjoner siden sist. Noen deltakere skriver opplevelsesnotat mellom timene.' }
+  ]}
+};
+
+let activeFish = null;
+function selFish(n) {
+  if (activeFish === n) { closeFish(); return; }
+  activeFish = n;
+  const d = fishData[n];
+  document.getElementById('fish-title').textContent = d.title;
+  document.getElementById('fish-hdr').style.background = d.color;
+  document.getElementById('fish-drill').innerHTML = buildDrill(d.items);
+  document.getElementById('fish-panel').classList.add('visible');
+  document.querySelectorAll('[data-f]').forEach(e => e.classList.toggle('active', parseInt(e.dataset.f) === n));
+}
+function closeFish() {
+  activeFish = null;
+  document.getElementById('fish-panel').classList.remove('visible');
+  document.querySelectorAll('[data-f]').forEach(e => e.classList.remove('active'));
+}
+function selMc(el, id) {
+  const grid = el.closest('.mcgrid');
+  grid.querySelectorAll('.mc').forEach(m => m.classList.remove('sel'));
+  el.classList.add('sel');
+  const parent = grid.parentElement;
+  parent.querySelectorAll('.mc-detail').forEach(d => d.classList.remove('open'));
+  const det = document.getElementById(id);
+  if (det) det.classList.add('open');
+}
+
+// ─────────────────────────────────────────────────────
+// PRAKSISTREKANTEN DATA
+// ─────────────────────────────────────────────────────
+const triData = {
+  1: { title: 'P1 – Handlinger (synlig praksis)', color: '#52b788', items: [
+    { label: 'Hva er P1?', deep: 'P1 er de konkrete handlingene i yrkesutøvelsen – det vi faktisk gjør og det som er direkte synlig. Veiledningen tar utgangspunkt i P1: fokuspersonen beskriver hva som skjedde.' },
+    { label: 'Startpunkt og endepunkt', deep: 'Veiledningssamtalen begynner på P1 og bør ende på P1. Etter at P2 og P3 er utforsket, vender samtalen tilbake: «Vil du gjøre noe annerledes?» Fokuspersonen trekker konklusjonen selv (Handal, Hofgaard & Lauvås, 2016).' },
+    { label: 'Veilederens spørsmål på P1-nivå', deep: 'For å utforske P1 bruker veilederen konkretiserende spørsmål:',
+      sub: '<ul class="qex-list"><li>Hva skjedde konkret?</li><li>Hva sa du? Hva gjorde du?</li><li>Hva var konteksten?</li><li>Hva la du merke til hos den andre?</li><li>Hva skjedde etterpå?</li></ul>' }
+  ]},
+  2: { title: 'P2 – Kunnskap og erfaringer (begrunnelser)', color: '#40916c', items: [
+    { label: 'Hva er P2?', deep: 'P2 er begrunnelsene for handlingene – kunnskap og erfaringer som ligger til grunn. Veilederen spør «Hvorfor vil du gjøre det slik?» Svarene kan dreie seg om egne erfaringer, faglig teori eller forskning (Handal, Hofgaard & Lauvås, 2016).' },
+    { label: 'Taus kunnskap på P2', deep: 'Vi er ikke alltid bevisste på hva som begrunner handlingene. Taus kunnskap (Polanyi) befinner seg på dette nivået. Situasjonsanalyse og spørsmål kan hjelpe fokuspersonen å begrepssette kunnskap de ikke visste at de hadde.' },
+    { label: 'Veilederens spørsmål på P2-nivå', deep: 'For å bevege samtalen fra P1 til P2:',
+      sub: '<ul class="qex-list"><li>Hvorfor vil du gjøre det slik?</li><li>Hvilken kunnskap lå til grunn for det du gjorde?</li><li>Hva fra teori eller forskning kan du knytte dette til?</li><li>Hvilke erfaringer trakk du på?</li><li>Hva har du lært om dette tidligere?</li></ul>' }
+  ]},
+  3: { title: 'P3 – Verdier og etikk (rettferdiggjøring)', color: '#1b4332', items: [
+    { label: 'Hva er P3?', deep: 'P3 er det etiske rettferdiggjøringsnivået – holdninger, verdier og det etiske grunnlaget for handlingene. Veilederen spør om det er riktig å handle slik, etisk forsvarlig osv. Ofte det mest skjulte nivået (Handal, Hofgaard & Lauvås, 2016).' },
+    { label: 'Fokuspersonen bestemmer', deep: 'Det er fokuspersonen som trekker konklusjonen etter P3-refleksjonen. Veilederen kan gripe inn ved uetisk eller uforsvarlig praksis, men i kollegaveiledning mellom profesjonelle yrkesutøvere stopper veiledningen ved fokuspersonens beslutning.' },
+    { label: 'Veilederens spørsmål på P3-nivå', deep: 'For å bevege samtalen til P3:',
+      sub: '<ul class="qex-list"><li>Synes du det er riktig å handle slik?</li><li>Er dette etisk sett forsvarlig?</li><li>Hvilke verdier ønsker du å legge vekt på her?</li><li>Hvem tok du hensyn til?</li><li>Hva styrte handlingene dine?</li><li>Hvilke dilemmaer innebar situasjonen?</li></ul>',
+      ex: 'Marit (Tveiten, 2019) oppdaget at holdningen hennes til pasienten – at han «ikke tok sykdommen sin alvorlig» – hadde bidratt til dårlig samvittighet uten at hun var klar over det.' }
+  ]}
+};
+
+let activeTri = null;
+function selTri(n) {
+  if (activeTri === n) { closeTri(); return; }
+  activeTri = n;
+  const d = triData[n];
+  document.getElementById('tri-title').textContent = d.title;
+  document.getElementById('tri-hdr').style.background = d.color;
+  document.getElementById('tri-drill').innerHTML = buildDrill(d.items);
+  document.getElementById('tri-panel').classList.add('visible');
+  document.querySelectorAll('[data-t]').forEach(e => e.classList.toggle('active', parseInt(e.dataset.t) === n));
+}
+function closeTri() {
+  activeTri = null;
+  document.getElementById('tri-panel').classList.remove('visible');
+  document.querySelectorAll('[data-t]').forEach(e => e.classList.remove('active'));
+}
+
+// ─────────────────────────────────────────────────────
+// PALLET DATA
+// ─────────────────────────────────────────────────────
+const palletData = {
+  P: { title: 'P – Problemstilling / problemavklaring', items: [
+    { label: 'Hva skjer i P-fasen?', deep: 'Fokuspersonen presenterer situasjonen det ønskes veiledning på. Veilederen lytter aktivt og hjelper å beskrive saken utfyllende. Åpne spørsmål er sentrale.' },
+    { label: 'Åpne startspørsmål', deep: 'Eksempler på gode åpningsfraser i P-fasen:',
+      sub: '<ul class="qex-list"><li>Kan du fortelle?</li><li>Hva er det du vil ha veiledning på i dag?</li><li>Jeg har lest VG-et ditt – kan du utdype?</li><li>Hva tenker du mest på akkurat nå?</li><li>Hvor vil du at vi starter?</li></ul>' },
+    { label: 'Veiledningsgrunnlaget (VG)', deep: 'Fokuspersonen kan forberede seg ved å skrive et VG – et kort notat om situasjonen de ønsker veiledning på. Dette gir veilederen et utgangspunkt og bidrar til at fokuspersonen allerede har reflektert noe.' }
+  ]},
+  A: { title: 'A – Avgrensning og analyse', items: [
+    { label: 'Avgrense og prioritere', deep: 'Saken avgrenses. Veilederen hjelper fokuspersonen å prioritere: hva er viktigst å jobbe med nå? Fokusert veiledning fremfor «vegg-til-vegg» (Handal, Hofgaard & Lauvås, 2016).' },
+    { label: 'Motivasjon og mål (MI)', deep: 'A-fasen inkluderer avklaring av motivasjon for endring og formulering av mål. MI brukes for å utforske ambivalens. SØM-mål: Sannsynlige, Ønskede, Målbare.',
+      tip: 'Pettersen & Løkke (2017): «Vi har plassert motiverende intervjuing tidlig i PALLET – under A-fasen, rett etter at problemet er avklart.»' },
+    { label: 'Spørsmål i A-fasen', deep: 'Undersøkende og avgrensende spørsmål:',
+      sub: '<ul class="qex-list"><li>Hva er det viktigste for deg å jobbe med i dag?</li><li>Hvis du bare kunne ta opp én ting nå – hva ville det vært?</li><li>Hva håper du å sitte igjen med etter denne timen?</li><li>Hvorfor er dette viktig for deg akkurat nå?</li><li>På en skala fra 1–10: hvor motivert er du for å endre dette?</li></ul>' }
+  ]},
+  L1: { title: 'L¹ – Den veilededes egne forslag', items: [
+    { label: 'Fokuspersonen først', deep: 'L1 er fokuspersonens egne forslag og ideer til løsning – FØR veilederen bidrar. Dette er autonomiprinsippet konkretisert: fokuspersonen eier sine handlingsalternativer.' },
+    { label: 'Hvorfor L1 før L2?', deep: 'Dersom veilederen foreslår først, risikerer man at fokuspersonen ukritisk adopterer dem av takknemlighet, eller avviser dem defensivt. L1 sikrer at fokuspersonens egne ressurser og perspektiver er utgangspunktet (Handal, Hofgaard & Lauvås, 2016).',
+      ex: 'Takknemlighetsfellen: «Jeg er så takknemlig over alt jeg har fått her – da bør jeg vel følge rådene, selv om jeg ikke synes det er best.»' },
+    { label: 'Spørsmål for å løfte frem L1', deep: 'Spørsmål som inviterer fokuspersonen til å formulere egne løsninger:',
+      sub: '<ul class="qex-list"><li>Hva har du selv tenkt å gjøre?</li><li>Hva tror du vil hjelpe?</li><li>Hvilke alternativer ser du?</li><li>Hva har du prøvd tidligere?</li><li>Hva ville en klok kollega gjort i din situasjon?</li></ul>' }
+  ]},
+  L2: { title: 'L² – Veilederens forslag', items: [
+    { label: 'Et tilbud, ikke en instruks', deep: 'Veilederen bidrar med alternative perspektiver og forslag – alltid som et tilbud fokuspersonen selv vurderer. Aldri som direktiv.' },
+    { label: 'Konfrontasjon som verktøy', deep: 'I L2 kan veilederen ta rollen som «lavmælt provokatør» – undersøke, utforske og utfordre (3 U-er). Konfrontasjon er å stille spørsmål ved oppfatninger, ikke å kritisere (Pettersen & Løkke, 2017).',
+      sub: '<ul class="qex-list"><li>Kunne det være en idé å ...?</li><li>Hva ville skje hvis du prøvde ...?</li><li>Jeg lurer på om det er noe du ikke har tenkt på – nemlig ...?</li><li>Har du vurdert ...?</li></ul>' }
+  ]},
+  E: { title: 'E – Evaluering', items: [
+    { label: 'To typer evaluering', deep: 'E kan innebære: (1) evaluering av veiledningssekvensen som nettopp har foregått, (2) evaluering av tiltak fokuspersonen har prøvd ut siden forrige veiledning (Pettersen & Løkke, 2017).' },
+    { label: 'Evalueringsspørsmål', deep: 'Spørsmål til bruk i E-fasen:',
+      sub: '<ul class="qex-list"><li>Hva sitter du igjen med fra dagens veiledning?</li><li>Hva var mest nyttig?</li><li>Hva ville du gjort annerledes neste gang?</li><li>Prøvde du tiltaket fra sist – hva skjedde?</li><li>Hva lærte du?</li></ul>' }
+  ]},
+  T: { title: 'T – Tiltak', items: [
+    { label: 'Konkrete handlinger til neste gang', deep: 'T er konkrete tiltak fokuspersonen vil prøve ut i praksis frem til neste veiledning. Formuleres av fokuspersonen selv og bør være så konkret som mulig: hva, hvordan og når.' },
+    { label: 'SMARTE mål', deep: 'Tiltaket bør knyttes til et SMART mål: Spesifikt, Målbart, Attraktivt, Realistisk, Tidfestet, Etisk. Gjør det lettere å vurdere om tiltaket er gjennomførbart og om det er nådd (Tveiten, 2019).' },
+    { label: 'Spørsmål i T-fasen', deep: 'Spørsmål for å konkretisere tiltaket:',
+      sub: '<ul class="qex-list"><li>Hva vil du gjøre konkret?</li><li>Når vil du gjøre det?</li><li>Hva kan hindre deg – og hva gjør du da?</li><li>Hvem kan støtte deg?</li><li>Hvordan vil du merke at det virker?</li></ul>' }
+  ]}
+};
+
+let activePallet = null;
+function selPallet(key) {
+  if (activePallet === key) { activePallet = null; document.querySelectorAll('.pstep').forEach(s => s.classList.remove('active')); document.getElementById('pallet-panel').classList.remove('visible'); return; }
+  activePallet = key;
+  const d = palletData[key];
+  document.querySelectorAll('.pstep').forEach(s => s.classList.toggle('active', s.dataset.p === key));
+  document.getElementById('pallet-title').textContent = d.title;
+  document.getElementById('pallet-drill').innerHTML = buildDrill(d.items);
+  document.getElementById('pallet-panel').classList.add('visible');
+}
+
+// ─────────────────────────────────────────────────────
+// CARE DATA
+// ─────────────────────────────────────────────────────
+const careData = [
+  { letter:'C', word:'Communication', color:'#1b4332', items:[
+    { label:'Ikke nok å ha holdninger internt', deep:'Respekt og empati må kommuniseres – verbalt og nonverbalt. En veileder som er empatisk på innsiden men kald i uttrykket, kommuniserer noe annet enn det som er ment.' },
+    { label:'Kongruens – samsvar', deep:'Verbal og nonverbal kommunikasjon må stemme overens. Dobbeltkommunikasjon – der ord og kropp sier ulike ting – svekker tilliten og arbeidsalliansen.',
+      tip:'Parafrasering er en sentral ferdighet for å kommunisere empati: «Er det slik at ...?» / «Slik jeg forstår deg ...»' }
+  ]},
+  { letter:'A', word:'Authenticity', color:'#2d6a4f', items:[
+    { label:'Ekte interesse – ikke bare teknikk', deep:'Veiledning krever genuin nysgjerrighet på den veilededes situasjon og perspektiv. En «teknisk» veileder uten ekte interesse vil oppleves som mekanisk.',
+      ex:'Pettersen & Løkke (2017): Veiledning kan på sitt beste fortone seg som detektivarbeid der ingen kjenner svaret på forhånd.' },
+    { label:'Åpenhet for den andres perspektiv', deep:'Autentisitet innebærer at veilederen legger egne forutinntatte oppfatninger til side og er genuint åpen for at den veiledede kan tenke og handle annerledes.' }
+  ]},
+  { letter:'R', word:'Regard / Respect', color:'#40916c', items:[
+    { label:'Betingelsesløs positiv innstilling', deep:'Veilederen er ikke-dømmende og har en grunnleggende positiv innstilling uavhengig av hva som deles. Ser, respekterer og verdsetter fokuspersonen som den hun/han er.' },
+    { label:'Fravær av moralsk indignasjon', deep:'Selv om veilederen hører om problematisk praksis, er første respons romslighet og utforskning – ikke moralsk fordømmelse. Indignasjon stenger dialogen.',
+      tip:'I MI kalles dette medrulling – man ruller med motstand fremfor å møte det med konfrontasjon.' }
+  ]},
+  { letter:'E', word:'Empathy', color:'#52b788', items:[
+    { label:'Empati må kommuniseres', deep:'Empati er den best dokumenterte enkeltfaktoren i veiledning – men det er ikke nok å oppleve empati internt. Nøkkelen er å kommunisere den, f.eks. gjennom parafraser.' },
+    { label:'Parafrase-eksempler', deep:'Varierte innledningsfraser for parafrasering:',
+      sub:'<ul class="qex-list"><li>Har jeg tolket deg rett når du sier ...?</li><li>Slik jeg forstår det, så ...?</li><li>Med andre ord tenker du ...?</li><li>Du opplever at ...?</li><li>Det betyr altså at ...?</li><li>På meg virker det som ...?</li><li>Kan jeg forstå deg slik at ...?</li></ul>' }
+  ]}
+];
+
+const solerData = [
+  { label:'S – Squarely: vend deg mot den veiledede', deep:'Vend kroppen mot fokuspersonen – signaliserer tilstedeværelse. En veileder som sitter på skrå eller halvt bortvendt, kommuniserer distanse uavhengig av hva som sies.' },
+  { label:'O – Open posture: åpen kroppsholdning', deep:'Ikke kryss armer eller ben på en måte som kan oppfattes som lukkethet. En åpen kropp signaliserer tilgjengelighet og villighet til å ta imot.' },
+  { label:'L – Lean forward: len deg fremover', deep:'Fremoverlening signaliserer engasjement. Ikke en kronisk posisjon, men noe som skjer spontant i engasjerte samtaler. Kombinert med bakoverlening og kryssede armer signaliserer uinteresserthet.' },
+  { label:'E – Eye contact: god øyekontakt', deep:'Naturlig og kontinuerlig øyekontakt – ikke stirring. Vi har vanligvis mer øyekontakt når vi lytter enn når vi snakker.' },
+  { label:'R – Relatively relaxed: relativt avslappet', deep:'Formidler at veilederen trives i situasjonen. Relativt er viktig: fullstendig avslappet signaliserer uinteresserthet. Målet er rolig, oppmerksom tilstedeværelse.' }
+];
+
+function buildCare() {
+  const grid = document.getElementById('care-grid');
+  grid.innerHTML = careData.map(c => `
+    <div class="care-card" style="border-color:${c.color};">
+      <div class="care-letter" style="color:${c.color};">${c.letter}</div>
+      <div class="care-word">${c.word}</div>
+      <ul class="dl" style="border-top:1px solid var(--border);margin-top:0.4rem;">${buildDrill(c.items)}</ul>
+    </div>`).join('');
+  document.getElementById('soler-list').innerHTML = buildDrill(solerData);
+}
+
+// ─────────────────────────────────────────────────────
+// SPØRSMÅLSBIBLIOTEK
+// ─────────────────────────────────────────────────────
+const qTypes = [
+  { id:'apne', label:'Åpne', color:'#1b4332', def:'Åpne spørsmål begynner med hva, hvordan, hvilke. De gir fokuspersonen rom til å fortelle fritt, uten forventning om bestemte svar (Pettersen & Løkke, 2017). Anbefalt å bruke tidlig i veiledningen – åpner kommunikasjonen.', examples:['Hva skjedde?','Hvordan opplevde du det?','Hvilke tanker gjør du deg om dette?','Hva tenker du er det viktigste her?','Hvordan vil du beskrive situasjonen?'] },
+  { id:'lukkede', label:'Lukkede', color:'#40916c', def:'Lukkede spørsmål inviterer til korte svar (ja/nei). Anbefales brukt sparsomt, men kan være nyttige for å bekrefte forståelse eller avslutte et tema. Pas på å ikke stille for mange lukkede spørsmål på rad – det skaper et forhørsliknende klima.', examples:['Er dette noe du har opplevd før?','Klarte du å gjennomføre tiltaket?','Er du fornøyd med hvordan det gikk?','Vil du fortsette på dette temaet?'] },
+  { id:'konkret', label:'Konkretiserende', color:'#2d6a4f', def:'Retter seg mot å få informasjon om faktiske forhold. Brukes i P-fasen for å hjelpe fokuspersonen beskrive situasjonen grundig (Lauvås et al., 2016 i Pettersen & Løkke, 2017).', examples:['Hva sa NN da dette skjedde?','Hva gjorde du konkret?','Hvem var til stede?','Hva skjedde umiddelbart etterpå?','Hva var konteksten?'] },
+  { id:'undersoek', label:'Undersøkende', color:'#52b788', def:'Tar sikte på å klargjøre forståelse og opplevelse. Hjelper fokuspersonen å gå dypere inn i situasjonen (Lauvås et al., 2016 i Pettersen & Løkke, 2017).', examples:['Hvorfor synes du dette er utfordrende?','Hva betyr dette for deg?','Hva handler dette egentlig om?','Hvordan forstår du denne situasjonen?'] },
+  { id:'effekt', label:'Effektspørsmål', color:'#74c69d', def:'Fremtidsrettede spørsmål som bidrar til at fokuspersonen oppdager konsekvenser av valg og situasjoner som har mye å si (Tveiten, 2019).', examples:['Hva vil du gjøre hvis du opplever noe liknende neste gang?','Hvordan tror du dette vil påvirke deg?','Hva vil dette bety for deg fremover?','Hva vil skje hvis du ikke gjør noe?'] },
+  { id:'skalering', label:'Skalering', color:'#b7e4c7', def:'Konstruerer en tenkt skala fra 0–10 for å kartlegge grad, motivasjon og opplevelse. Nyttig for å avklare ambivalens og formulere realistiske mål (Pettersen & Løkke, 2017; Tveiten, 2019).', examples:['På en skala fra 1–10: hvor viktig er dette for deg?','Hvor vil du plassere deg i dag?','Hvorfor plasserer du deg der – og ikke lavere?','Hva skal til for å komme ett steg høyere?','Hvor høyt er det realistisk å komme?'] },
+  { id:'mirakel', label:'Mirakelspørsmål', color:'#1b4332', def:'Hypotetiske spørsmål fra LØFT (Løsningsfokusert tilnærming) der den veiledede forestiller seg en framtid uten problemet. Inspirert av Ericksons arbeid. Brukes ikke ved traumatiske hendelser (Pettersen & Løkke, 2017).', examples:['Tenk deg at du legger deg i kveld og mens du sover skjer det et mirakel – problemene er borte. Hva ville vært det første lille tegnet i morgen tidlig?','Hva ville vært annerledes?','Hva ville du gjort som du ikke gjør i dag?','Hva ville kollegaene dine merke?','Hva skal til for at et bitte lite mirakel skal skje?'] },
+  { id:'unntak', label:'Unntaksspørsmål', color:'#2d6a4f', def:'LØFT-spørsmål som søker situasjoner der problemet var fraværende eller mindre. Målet er å finne og forstørre det som allerede fungerer (Pettersen & Løkke, 2017).', examples:['Kan du huske en gang dette problemet var mindre?','Hva var annerledes da?','Hva gjorde du på en annen måte?','Hvordan klarte du det?','Har du opplevd dette over lengre tid?'] },
+  { id:'mestring', label:'Mestringsspørsmål', color:'#40916c', def:'LØFT-spørsmål for situasjoner der fokuspersonen ikke finner klare unntak. Tar sikte på å synliggjøre ressurser og vekke motivasjon med utgangspunkt i det som fungerer (Pettersen & Løkke, 2017).', examples:['Hvordan holder du ut i denne situasjonen?','Hva er det ved deg som gjør at du ikke gir opp?','Det høres vanskelig ut – hvordan kommer du deg igjennom dagen?','Hva forteller dette om egenskaper du har?','Er det noen som legger merke til det du faktisk klarer?'] },
+  { id:'refleksiv', label:'Refleksive', color:'#52b788', def:'Tomms spørsmål med hensikt å hjelpe til med å se nye muligheter der man står fast. Inneholder ingen innebygde svar – åpne spørsmål som inviterer til åpen refleksjon. Brukeren finner selv veien videre (Jensen & Ulleberg, 2019).', examples:['Hva tror du hadde skjedd hvis du gjorde noe helt nytt?','Hvordan kan dette problemet være en løsning på noe?','Hva ville skje om du snakket med ham om det?','Hvilke andre måter kan dette problemet forstås på?','Hva tror du endres hvis du gjør det på denne måten?'] }
+];
+
+function buildQTypes() {
+  const tabs = document.getElementById('qtabs');
+  const panels = document.getElementById('qpanels');
+  tabs.innerHTML = qTypes.map(q => `<button class="qtab" data-qid="${q.id}" onclick="selQTab('${q.id}')">${q.label}</button>`).join('');
+  panels.innerHTML = qTypes.map(q => `
+    <div class="qpanel" id="qp-${q.id}">
+      <h4>${q.label}</h4>
+      <div class="qdef">${q.def}</div>
+      <ul class="qex-list">${q.examples.map(e=>`<li>${e}</li>`).join('')}</ul>
+    </div>`).join('');
+  selQTab('apne');
+}
+function selQTab(id) {
+  document.querySelectorAll('.qtab').forEach(t => t.classList.toggle('active', t.dataset.qid === id));
+  document.querySelectorAll('.qpanel').forEach(p => p.classList.toggle('active', p.id === 'qp-' + id));
+}
+
+// Tomm matrix
+const tommData = [
+  { id:'lineaer', name:'Lineære spørsmål', paradigme:'Lineær årsak–virkning', hensikt:'Orienterende', color:'#e8f4fd', textcolor:'#1a3a5c',
+    def:'Spørsmål etter årsak og forklaring – «Hvem gjorde hva? Hvor? Når? Hvorfor?» Nyttige for å kartlegge situasjonen og forstå hvordan fokuspersonen tenker. Men bruk av for mange lineære spørsmål kan oppleves som forhør og søken etter skyld (Jensen & Ulleberg, 2019).',
+    ex:['Hva er grunnen til at dette skjedde?','Hvem var involvert?','Hvorfor reagerte du slik?','Hva mener du er årsaken til problemet?'] },
+  { id:'strategisk', name:'Strategiske spørsmål', paradigme:'Lineær årsak–virkning', hensikt:'Påvirkende', color:'#fde8e8', textcolor:'#7a1212',
+    def:'Ledende spørsmål med hensikt å hjelpe den veiledede i en bestemt retning. Inkluderer ofte et forslag til svar. Kan redusere handlingsrommet, men er nyttige i undervisningssituasjoner der man ønsker å utvikle en bestemt faglig forståelse (Jensen & Ulleberg, 2019).',
+    ex:['Hva er likheten mellom X og Y?','Hva bør du gjøre for å unngå at dette skjer igjen?','Burde du ikke snakke med kollegaen din om dette?','Hva er det klokeste å gjøre her?'] },
+  { id:'sirkulaer', name:'Sirkulære spørsmål', paradigme:'Systemisk / konstruktivistisk', hensikt:'Orienterende', color:'#f2faf5', textcolor:'#1b4332',
+    def:'Utforsker relasjoner og sammenhenger mellom hendelser, personer og ideer. Opprinnelig utviklet av Milano-gruppen i familieterapifeltet. Hjelper fokuspersonen å se situasjonen i et nytt perspektiv (Jensen & Ulleberg, 2019).',
+    ex:['Hva er forskjellen på situasjonen nå og for tre år siden?','Hva tror du kollegaen din tenker om dette?','Er det forskjell på om det er Pettersen eller Hansen på jobb?','Hvilke ulike ideer har du om hvordan dette kan forstås?'] },
+  { id:'refleksiv2', name:'Refleksive spørsmål', paradigme:'Systemisk / konstruktivistisk', hensikt:'Påvirkende', color:'#fff8e1', textcolor:'#6b4c00',
+    def:'Inneholder ingen innebygde svar – inviterer til åpen refleksjon. Hensikten er å påvirke, men uten å bestemme retningen. Brukeren finner selv sin vei. Egner seg ikke i sjokk- eller forvirringssituasjoner (Jensen & Ulleberg, 2019).',
+    ex:['Hva tror du ville skjedd hvis du gjorde noe helt nytt?','Hvordan kan dette problemet være en løsning på noe?','Hva ville skje om du skiftet perspektiv fullstendig?','Hvordan kan situasjonen forstås i en annen kultur eller tid?'] }
+];
+
+function buildTomm() {
+  const grid = document.getElementById('tomm-grid');
+  grid.innerHTML = tommData.map(t => `
+    <div class="tomm-cell" style="background:${t.color};" data-tid="${t.id}" onclick="selTomm('${t.id}')">
+      <div class="tomm-label" style="color:${t.textcolor};">${t.paradigme} — ${t.hensikt}</div>
+      <div class="tomm-name" style="color:${t.textcolor};">${t.name}</div>
+    </div>`).join('');
+}
+function selTomm(id) {
+  const t = tommData.find(x => x.id === id);
+  document.querySelectorAll('.tomm-cell').forEach(c => c.classList.toggle('sel', c.dataset.tid === id));
+  document.getElementById('tomm-title').textContent = t.name;
+  document.getElementById('tomm-def').textContent = t.def;
+  document.getElementById('tomm-exlist').innerHTML = t.ex.map(e=>`<li>${e}</li>`).join('');
+  document.getElementById('tomm-detail').style.display = 'block';
+}
+
+// ─────────────────────────────────────────────────────
+// REFLEKSJONSNIVÅER
+// ─────────────────────────────────────────────────────
+const stairData = [
+  { num:'1', name:'Deskriptiv refleksjon', hint:'Fortell og beskriv', color:'#52b788', textcolor:'white',
+    desc:'Å beskrive en hendelse, situasjon eller handling. Denne refleksjonen er bevisstgjørende og bidrar til bearbeiding ved at man får satt ord på det som har skjedd (Tveiten, 2019).',
+    qs:['Hva skjedde? Fortell, beskriv hendelsen.','Hva sa du? Hva gjorde du? Hva følte du?','Hva var konteksten?','Hvordan er det for deg å fortelle dette?','Hva vil du at vi setter søkelys på?'],
+    ex:'Per, nyutdannet sykepleier, beskriver at han fant en pasient død på badet. Han gjengir hva som skjedde steg for steg – hjerte-lungeredning, at han glemte å kalle på hjelp, at han kjeftet på en kollega. Veilederen skriver stikkord på flippoveren.' },
+  { num:'2', name:'Dialogisk refleksjon', hint:'Forstå og tolke', color:'#40916c', textcolor:'white',
+    desc:'Å forsøke å forstå hva hendelsen handler om – hvorfor den hendte, hva alt kan dreie seg om. Hensikten er økt felles forståelse gjennom dialog (Tveiten, 2019).',
+    qs:['Hvordan kan hendelsen forstås?','Hvorfor skjedde dette?','Hva fra teori og forskning kan du knytte dette til?','Hva tenker du om dette nå?','Hva handler situasjonen egentlig om?'],
+    ex:'Veilederen spør Per: «Hva fra teori og forskning kan du se denne hendelsen i lys av?» De andre deltakerne bidrar med kunnskap om stress, pasientsikkerhet og hjerte-lungeredning. Per nikker gjenkjennende.' },
+  { num:'3', name:'Kritisk refleksjon', hint:'Vurder og analyser systematisk', color:'#2d6a4f', textcolor:'white',
+    desc:'Å se systematisk og analytisk på en hendelse. Kritisk betyr spørrende, undrende, undersøkende – ikke negativt. Kritisk refleksjon er intellektuell virksomhet på høyt nivå (Tveiten, 2019).',
+    qs:['Hva er du fornøyd med? Hva mestret du?','Hva kunne du gjort annerledes?','Hva hadde skjedd om du hadde handlet annerledes?','Hva trenger du å videreutvikle?','Hva lærte du?'],
+    ex:'Per sier han ser hva han skulle gjort annerledes. Han vil sette seg inn i rutiner og øve på hjerte-lungeredning. Han oppdager at han faktisk handlet fornuftig på mange punkter.' },
+  { num:'4', name:'Etisk refleksjon', hint:'Verdier, dilemmaer og ansvar', color:'#1b4332', textcolor:'white',
+    desc:'Å vurdere egen praksis i lys av etisk teori. Verdier og holdninger påvirker handlingene i stor grad. Etisk bevissthet er av stor betydning for kvaliteten på praksis (Tveiten, 2019).',
+    qs:['Hvilke etiske utfordringer møtte du?','Hvilke dilemmaer innebar hendelsen?','Hvem tok du hensyn til?','Hvilke verdier lå til grunn?','Hva styrte handlingene dine?','Hvilken etisk teori kan du se hendelsen i lys av?'],
+    ex:'Per reflekterer over egne holdninger og over plikten til pasienten kontra seg selv. Han oppdager et etisk dilemma han ikke hadde sett tidligere.' }
+];
+
+function buildStair() {
+  const cont = document.getElementById('stair-cont');
+  cont.innerHTML = stairData.map((s, i) => `
+    <div class="stair-step" style="background:${s.color};color:${s.textcolor};padding-left:${0.8 + i*0.6}rem;" onclick="toggleStair(this)">
+      <span class="ss-num">${s.num}</span>
+      <div style="overflow:hidden;">
+        <div class="ss-name">${s.name}</div>
+        <div class="ss-hint">${s.hint}</div>
+      </div>
+      <div class="stair-detail">
+        <p>${s.desc}</p>
+        <p style="font-weight:600;margin-top:0.5rem;margin-bottom:0.3rem;font-size:0.8rem;">Veilederens spørsmål:</p>
+        <ul>${s.qs.map(q=>`<li>${q}</li>`).join('')}</ul>
+        <div style="background:rgba(255,255,255,0.2);border-radius:5px;padding:0.5rem 0.7rem;margin-top:0.6rem;font-size:0.79rem;font-style:italic;">${s.ex}</div>
+      </div>
+    </div>`).join('');
+}
+function toggleStair(el) { el.classList.toggle('sel'); }
+
+// ─────────────────────────────────────────────────────
+// GRUPPEUTVIKLING
+// ─────────────────────────────────────────────────────
+const gphaseData = [
+  { label:'Forming', color:'#b7e4c7', def:'Deltakerne blir kjent og danner seg inntrykk av oppgavene. Vanlig å oppleve utrygghet, usikkerhet og spenning. Tilsvarer oppstarts-/kontraktfasen i fiskefiguren.', veileder:['Legge til rette for trygghetsopplevelse.','Gjennomføre bli-kjent-metoder.','Tydeliggjøre hensikt, mål, normer og struktur.','Informere om hva veiledning er – og ikke er.'] },
+  { label:'Storming', color:'#74c69d', def:'Individuelle forskjeller og konflikter tydeliggjøres. Kamp om posisjoner og roller. I formelle veiledningsgrupper kan stormingen synes svak initialt, men kan komme sterkere senere.', veileder:['Sørge for at motsetninger kommer til uttrykk og ikke hemmer prosessen.','Fungere som rollemodell – vise at man tåler ubehag og konflikter.','Bruke metakommunikasjon til å sette ord på mønstrene i gruppen.'] },
+  { label:'Norming', color:'#52b788', def:'Gruppen rydder opp i uklarheter og konflikter. Rollene blir tydelige, normene fastsettes. Gruppen får ro til å arbeide mot hensikten. Behovet for opprydding kan oppstå gjentatte ganger.', veileder:['Aktivt legge til rette for opprydding.','Bevisstgjøre gruppen om egne mønstre.','Støtte normforankring og tydeliggjøre felles forståelse.'] },
+  { label:'Performing', color:'#40916c', def:'Gruppen arbeider mot å nå mål og fylle sin funksjon. Tilsvarer arbeidsfasen i fiskefiguren. De tre første fasene er vesentlige for at denne fasen skal bli hensiktsmessig.', veileder:['Holde fokus på arbeidet og fremgangen.','Utfordre til dypere refleksjon (fra deskriptiv til etisk).','Sikre at alle deltakerens stemmer høres.','Justere struktur og metoder etter gruppens behov.'] }
+];
+
+const vfunkData = [
+  { title:'1. Informere og instruere', color:'#c8e6c9', border:'#2e7d32', desc:'Veileder orienterer, forteller, viser, demonstrerer og underviser. Typisk i mesterlære, men også aktuelt i begynnelsen av samtalepreget veiledning – særlig i begynnerfasen.',
+    ex:'Veilederen forklarer hva veiledning er, hva kontrakten innebærer, og hvordan situasjonsanalyse brukes.' },
+  { title:'2. Katalysator – utfordre til refleksjon', color:'#fff9c4', border:'#f9a825', desc:'Veileder oppmuntrer og utfordrer den veiledede til refleksjon, undring og undersøkelse over eget faglig perspektiv og yrkesutøvelse. Dette er veilederens hovedfunksjon i reflekterende veiledning.',
+    ex:'Veilederen stiller spørsmål som «Hva tenker du om hvorfor du handlet slik?» eller «Hva ville skjedd dersom du hadde gjort noe annerledes?»' },
+  { title:'3. Støtte og bekrefte', color:'#bbdefb', border:'#1565c0', desc:'Veileder berømmer, verdsetter og bekrefter den veilededes innsats. Hyppig og variert tilbakemelding er nøkkelbegreper. Denne funksjonen er viktig i alle veiledningens faser.',
+    ex:'«Jeg ser at du virkelig har brukt tid på å forberede deg» / «Det du gjorde der krevde mot – det var bra.»' },
+  { title:'4. Containerfunksjon – romme det vanskelige', color:'#f3e5f5', border:'#6a1b9a', desc:'Veilederen er villig til å ta imot og ta vare på temaer den veiledede opplever som følelsesmessig vanskelige. «Romme» betyr å holde det – ikke avvise eller bagatellisere. Grenser til terapifeltet her.',
+    ex:'Den veiledede gråter og forteller om en krevende situasjon. Veilederen lytter, sitter stille, nikker – uten å «fikse» eller gi råd. Signaliserer: dette er trygt å dele her.' }
+];
+
+function buildGruppe() {
+  const btns = document.getElementById('gphase-btns');
+  const panels = document.getElementById('gphase-panels');
+  btns.innerHTML = gphaseData.map((g, i) => `<button class="gphase-btn" onclick="selGphase(${i})">${g.label}</button>`).join('');
+  panels.innerHTML = gphaseData.map((g, i) => `
+    <div class="gphase-panel" id="gp-${i}">
+      <h3 style="color:var(--c1);">${g.label}</h3>
+      <p style="font-size:0.83rem;line-height:1.6;color:#333;margin-bottom:0.7rem;">${g.def}</p>
+      <p style="font-size:0.8rem;font-weight:600;color:var(--c2);margin-bottom:0.3rem;">Veilederens ansvar i denne fasen:</p>
+      <ul style="list-style:none;padding:0;">${g.veileder.map(v=>`<li style="font-size:0.81rem;padding:0.25rem 0;display:flex;gap:0.5rem;border-bottom:1px solid #f0ede8;"><span style="color:var(--c3);font-weight:700;">→</span>${v}</li>`).join('')}</ul>
+    </div>`).join('');
+  const cards = document.getElementById('vfunk-cards');
+  cards.innerHTML = vfunkData.map(v => `
+    <div class="gcard open" style="border-color:${v.border};">
+      <div class="gcard-head" onclick="toggleG(this)"><span class="gcd" style="background:${v.border};"></span><span class="gct">${v.title}</span><span class="gca">›</span></div>
+      <div class="gcb"><p>${v.desc}</p><div class="ex" style="margin-top:0.5rem;">${v.ex}</div></div>
+    </div>`).join('');
+}
+function selGphase(i) {
+  document.querySelectorAll('.gphase-btn').forEach((b,j) => b.classList.toggle('active', j === i));
+  document.querySelectorAll('.gphase-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('gp-' + i).classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────
+// SYMMETRI
+// ─────────────────────────────────────────────────────
+const symSData = [
+  { label:'Definisjon – likhet forsterker likhet', deep:'As atferd, følelse eller mening er knyttet til samme atferd hos B. Mer av As uttrykk fører til mer av samme hos B. Deltakerne «punktuerer på likhet» (Jensen & Ulleberg, 2019).',
+    ex:'Jo mer én ler, desto mer ler den andre. Eller: jo mer én klandrer, desto mer forsvarer den andre seg.' },
+  { label:'Fruktbart eller destruktivt', deep:'Fruktbart: felles engasjement, delt ansvar. Destruktivt: maktkamp, eskalerende krangel, konkurranse om å være sykest eller flinkest. Symmetrisk eskalering kan bli svært slitsomt.' },
+  { label:'I veiledningsgrupper – prestasjonspress', deep:'Jensen & Ulleberg (2019) beskriver en veiledningsgruppe der alle var svært reflekterte. Symmetrien gjorde det vanskelig å dele uferdige tanker – alle ville fremstå velformulerte. Veiledningen ble en prestasjonsarena.',
+    tip:'Killen (2007): Veilederen bør aktivt jobbe for jevnere statusfordeling og støtte de minst ordsterke.' },
+  { label:'Hva kan veilederen gjøre?', deep:'Handal, Hofgaard & Lauvås (2016): Sterk struktur er delvis ment å nullstille etablerte samspillsmønstre. Metakommunikasjon kan sette ord på mønsteret: «Jeg legger merke til at vi alle konkurrerer om å ha de beste svarene – hva tenker dere om det?»' }
+];
+const symKData = [
+  { label:'Definisjon – ulikhet som utfyller', deep:'A og B har ulik, men gjensidig tilpasset atferd. «Motsetninger tiltrekker hverandre.» Klassisk: én snakker, én lytter – jo mer det snakkes, desto mer lyttes det (Jensen & Ulleberg, 2019).' },
+  { label:'Naturlig i veilederrollen', deep:'Relasjonen mellom veileder og fokusperson er i utgangspunktet komplementær. Dette er ikke nødvendigvis problematisk – det er en del av veiledningens struktur. Utfordringen oppstår dersom rollene sementeres.' },
+  { label:'Kan forsterke maktforhold', deep:'I kollegaveiledning kan hierarki fra personalgruppen reproduseres: den «sterke» er alltid hjelper, den «svake» alltid mottaker. Dette hemmer utvikling og gjensidighet.',
+    ex:'Barnevernsarbeider bekymret, foreldre bagatelliserer – jo mer den ene bekymrer seg, desto mer bagatelliserer den andre. Klassisk destruktivt komplementært mønster.' },
+  { label:'Hva kan bryte mønsteret?', deep:'Metakommunikasjon: gjøre mønsteret eksplisitt i samtalen. Rollespill og perspektivbytte. I kollegaveiledning: alle veksler mellom rollen som veileder og veiledet. Struktur som «nullstiller» etablerte roller.' }
+];
+
+function buildSym() {
+  document.getElementById('sym-s-list').innerHTML = buildDrill(symSData);
+  document.getElementById('sym-k-list').innerHTML = buildDrill(symKData);
+}
+function showSym(id, btn) {
+  document.querySelectorAll('.sym-panel').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.sym-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sp-' + id).classList.add('visible');
+  btn.classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────
+// SAMMENLIGN
+// ─────────────────────────────────────────────────────
+const compareData = [
+  { fish:'Planleggingsfasen', pallet:'(Før samtalen) – VG, forberedelse', match:false },
+  { fish:'Oppstart / bli-kjent / kontraktfase', pallet:'P – Problemstilling, presentasjon av saken', match:true },
+  { fish:'Arbeidsfasen (hoveddelen)', pallet:'A → L¹ → L² – Analyse, løsningsutforskning', match:true },
+  { fish:'Arbeidsfasen (avslutning)', pallet:'E – Evaluering av sekvensen', match:true },
+  { fish:'Avslutningsfasen', pallet:'T – Tiltak, konkrete handlinger videre', match:true },
+];
+
+function buildCompare() {
+  const wrap = document.getElementById('compare-wrap');
+  wrap.innerHTML = `
+    <div><h4 style="background:var(--c2);padding:0.5rem 0.7rem;border-radius:6px;color:white;font-size:0.85rem;margin-bottom:0.5rem;">Fiskefiguren (Tveiten)</h4>
+    ${compareData.map(r=>`<div class="cmp-row"><div class="cmp-cell ${r.match?'match':''}">${r.fish}</div></div>`).join('')}
+    </div>
+    <div><h4 style="background:var(--c3);padding:0.5rem 0.7rem;border-radius:6px;color:white;font-size:0.85rem;margin-bottom:0.5rem;">PALLET (Pettersen &amp; Løkke)</h4>
+    ${compareData.map(r=>`<div class="cmp-row"><div class="cmp-cell ${r.match?'match':''}">${r.pallet}</div></div>`).join('')}
+    </div>`;
+}
+
+// ─────────────────────────────────────────────────────
+// SCENARIO
+// ─────────────────────────────────────────────────────
+const scenarios = [
+  { desc:'Fokuspersonen forteller at hun alltid mislykkes i møter med en bestemt kollega, og at det aldri går bra. Hun er oppgitt og sier «det er bare slik det er».', q:'Hvilken spørsmålsstrategi passer best for å åpne opp for nye perspektiver?',
+    opts:['Stille lineære spørsmål: «Hva er grunnen til at det alltid går galt?»','Stille unntaksspørsmål: «Kan du huske en gang det gikk bedre – hva var annerledes da?»','Gi råd om hvordan hun bør kommunisere med kollegaen.','Stille et skaleringsspørsmål: «Hvor dårlig er forholdet på en skala fra 1–10?»'],
+    correct:1, fb:'Unntaksspørsmål (LØFT) er her det beste valget. Fokuspersonen er fastlåst i «det er alltid slik» – unntaksspørsmålet bryter dette mønsteret ved å søke etter ressurser og unntak som allerede finnes. Lineære spørsmål forsterker problemfokuset, og råd undergraver autonomien.' },
+  { desc:'En nyutdannet barnevernspedagog kommer til veiledning og beskriver steg for steg en vanskelig episode med en familie. Han er detaljert og forteller mye.', q:'Du befinner deg i begynnelsen av arbeidsfasen. Hvilket refleksjonsnivå er du på, og hva bør neste skritt være?',
+    opts:['Etisk refleksjon – still spørsmål om verdier og dilemmaer.','Deskriptiv refleksjon – fokuspersonen beskriver situasjonen. Neste steg er å bevege seg til dialogisk refleksjon: «Hvordan kan denne hendelsen forstås?»','Kritisk refleksjon – spør om hva han gjorde riktig og galt.','PALLET L1-fasen – la fokuspersonen foreslå løsninger.'],
+    correct:1, fb:'Fokuspersonen er i deskriptiv refleksjon – han beskriver hva som skjedde. Det naturlige neste steget er dialogisk refleksjon: hjelpe fokuspersonen å forstå og tolke hendelsen. Kritisk og etisk refleksjon kommer etter at forståelsesrammen er etablert (Tveiten, 2019).' },
+  { desc:'I en veiledningsgruppe dominerer én deltaker stadig samtalen. De andre sier lite. Gruppen har møttes fem ganger.', q:'Hvilken forståelse av gruppedynamikk er mest relevant, og hva bør veilederen gjøre?',
+    opts:['Dette er et tegn på forming-fasen – gruppen er ennå ikke trygg nok.','Dette kan være et symmetrisk mønster der konkurranse om oppmerksomhet dominerer.','Dette kan skyldes komplementaritet: én tar ordet, de andre lytter. Veilederen bør jobbe aktivt for jevnere statusfordeling og støtte de minst ordsterke til å komme til orde.','Veilederen bør gi råd til den dominerende deltakeren om å snakke mindre.'],
+    correct:2, fb:'Dette er et klassisk komplementært mønster: én snakker, andre lytter. Killen (2007) understreker at veilederen aktivt bør bidra til jevnere statusfordeling. Råd til enkeltdeltakere er ikke veiledrollen – veilederen metakommuniserer om mønsteret i stedet.' },
+  { desc:'En fokusperson sier at han ønsker å forbedre sine møter med studenter, men er lite konkret. I A-fasen er motivasjonen uklar.', q:'Hvilken tilnærming passer best for å avklare motivasjon?',
+    opts:['Stille mirakelspørsmål: «Tenk deg at problemet er løst – hva er det første tegnet?»','Bruke MI-prinsipper og skalering: «På en skala fra 1–10, hvor viktig er dette for deg? Og hva skal til for å komme ett steg høyere?»','Gå rett til L1-fasen og spørre om løsninger.','Konfrontere fokuspersonen med at han ikke er klar for veiledning.'],
+    correct:1, fb:'A-fasen inkluderer avklaring av motivasjon, og MI (motiverende intervjuing) er direkte plassert her i PALLET. Skalering kombinert med utforskning av ambivalens er et effektivt verktøy. Mirakelspørsmålet er bedre egnet i L1/L2-fasen når problemet er avklart (Pettersen & Løkke, 2017).' },
+  { desc:'En veileder opplever at hun stadig gir råd i stedet for å stille spørsmål. Fokuspersonene virker takknemlige og sier de vil gjøre som hun sier.', q:'Hva er det teoretiske problemet med denne situasjonen?',
+    opts:['Ingenting – gode råd er verdifullt og sparer tid.','Veilederen er i containerfunksjon-rollen og bør fortsette.','Dette er takknemlighetsfellen (Handal, Hofgaard & Lauvås, 2016): fokuspersonen adopterer rådene av takknemlighet, ikke fordi de faktisk er best. Autonomiprinsippet og L1-prinsippet brytes.','Veilederen er for lite støttende og bør bli mer empatisk.'],
+    correct:2, fb:'Dette er takknemlighetsfellen. Handal, Hofgaard & Lauvås (2016) advarer eksplisitt mot dette: fokuspersoner kan følge råd de er uenige i fordi de vil vise takknemlighet. L1-prinsippet i PALLET og autonomietikken krever at fokuspersonen formulerer sine egne løsninger FØR veilederen bidrar.' },
+  { desc:'Veilederen legger merke til at fokuspersonens ord og kroppsspråk ikke stemmer overens: hun sier «det er greit», men virker anspent og unngår øyekontakt.', q:'Hvilken kompetanse og hvilken handling er mest relevant her?',
+    opts:['Veilederen bør ignorere kroppsspråket og holde seg til det verbale budskapet.','Global lytting (nivå 3) og aktiv lytting – veilederen speiler den mulige underteksten: «Du sier det er greit – men jeg opplever at du kanskje kjenner på noe annet?»','Veilederen bør stille et lineært spørsmål: «Er du sikker på at det er greit?»','Veilederen bør gi fokuspersonen tid og ikke kommentere.'],
+    correct:1, fb:'Global lytting (Tveiten, 2019) innebærer å lytte til mer enn ordene – fange opp nonverbale signaler. Aktiv lytting og speiling av undertekster er sentralt. Å navngi det man observerer («jeg opplever at du kanskje kjenner på noe annet») åpner rom for dypere refleksjon uten å presse.' }
+];
+
+let scIdx = 0, scAnswered = false;
+function buildScenario() {
+  scIdx = 0; scAnswered = false;
+  renderScenario();
+}
+function renderScenario() {
+  const s = scenarios[scIdx];
+  document.getElementById('sc-prog').textContent = `Scenario ${scIdx + 1} av ${scenarios.length}`;
+  const next = document.getElementById('sc-next');
+  next.classList.remove('show');
+  document.getElementById('sc-box').innerHTML = `
+    <div class="scenario-desc">${s.desc}</div>
+    <div style="font-size:0.84rem;font-weight:600;margin-bottom:0.6rem;color:var(--c1);">${s.q}</div>
+    <div class="s-opts">${s.opts.map((o,i)=>`<button class="s-opt" onclick="ansScenario(${i})" id="sc-opt-${i}">${o}</button>`).join('')}</div>
+    <div class="s-fb" id="sc-fb"></div>`;
+}
+function ansScenario(i) {
+  if (scAnswered) return;
+  scAnswered = true;
+  const s = scenarios[scIdx];
+  document.querySelectorAll('.s-opt').forEach((b,j) => { b.disabled = true; if (j === s.correct) b.classList.add('correct'); else if (j === i) b.classList.add('wrong'); });
+  const fb = document.getElementById('sc-fb');
+  fb.textContent = (i === s.correct ? '✓ Riktig! ' : '✗ Feil. ') + s.fb;
+  fb.classList.add('show', i === s.correct ? 'ok' : 'no');
+  if (scIdx < scenarios.length - 1) document.getElementById('sc-next').classList.add('show');
+}
+function nextScenario() { scIdx++; scAnswered = false; renderScenario(); }
+
+// ─────────────────────────────────────────────────────
+// QUIZ
+// ─────────────────────────────────────────────────────
+const Qs = [
+  { q:'Hvilken fase i fiskefiguren er størst og utgjør veiledningens kjerne?', opts:['Planleggingsfasen','Oppstarts-/bli-kjent-fasen','Arbeidsfasen','Avslutningsfasen'], c:2, fb:'Arbeidsfasen er lengst og er der fokuspersonen reflekterer over erfaringer og utfordringer.' },
+  { q:'Hva betegner P3 i praksistrekanten?', opts:['Handlinger i praksis','Kunnskap og erfaringer','Verdier og etisk rettferdiggjøring','Planlagte handlinger'], c:2, fb:'P3 er verdier, holdninger og etisk rettferdiggjøring. Veilederen spør: «Er dette etisk forsvarlig?»' },
+  { q:'Hva er C-ens rolle i CARE-ikonet?', opts:['Konfrontasjon','Å kommunisere respekt og empati – ikke bare ha dem','Coaching-ferdigheter','Kontraktetablering'], c:1, fb:'C = Communication. Holdninger og verdier må kommuniseres, ikke bare oppleves internt.' },
+  { q:'Hva skiller L¹ fra L² i PALLET-modellen?', opts:['L¹ er lederens forslag','L¹ er fokuspersonens egne forslag, L² er veilederens bidrag','L¹ er kortsiktige mål','L¹ og L² er det samme'], c:1, fb:'L¹ = fokuspersonens egne løsningsforslag. Veilederen bidrar ETTER (L²). Autonomiprinsippet.' },
+  { q:'Hva kjennetegner et symmetrisk samspill i en veiledningsgruppe?', opts:['Hierarki og klare roller','Likhet forsterker likhet – kan føre til prestasjonspress','Én leder og én lytter','Fokuspersonen dominerer alltid'], c:1, fb:'Symmetrisk samspill: As atferd forsterker samme atferd hos B. Kan skape prestasjonspress der ingen tør dele uferdige tanker.' },
+  { q:'Hvem trekker konklusjonen etter refleksjon over P2 og P3 i praksistrekanten?', opts:['Veilederen','Fokuspersonen selv','Gruppen i fellesskap','Den med mest erfaring'], c:1, fb:'Fokuspersonen trekker selv konklusjonen. Veilederens autonomirespekt er fundamental.' },
+  { q:'Hva er hensikten med refleksive spørsmål (Tomm)?', opts:['Å finne årsak og skyld','Å hjelpe fokuspersonen se nye muligheter uten å gi svar','Å lede fokuspersonen i en bestemt retning','Å kartlegge faktiske forhold'], c:1, fb:'Refleksive spørsmål (Tomm/Jensen & Ulleberg) inviterer til åpen refleksjon uten innebygde svar. Fokuspersonen finner selv sin vei.' },
+  { q:'Hva er deskriptiv refleksjon?', opts:['Å vurdere etiske dilemmaer','Å analysere årsaker og konsekvenser','Å fortelle og beskrive en hendelse slik den skjedde','Å kritisere praksis systematisk'], c:2, fb:'Deskriptiv refleksjon er det første nivået – å sette ord på hva som skjedde. Bevisstgjørende og bearbeidende (Tveiten, 2019).' },
+  { q:'Hvilken funksjon beskrives som veilederens «containerfunksjon»?', opts:['Å strukturere samtalen med PALLET','Å holde tilbake og ta vare på det fokuspersonen opplever som følelsesmessig vanskelig','Å konfrontere fokuspersonen','Å evaluere veiledningen'], c:1, fb:'Containerfunksjonen (Pettersen & Løkke, 2017): veilederens vilje og evne til å romme og ta vare på temaer fokuspersonen opplever som følelsesmessig vanskelige.' },
+  { q:'Hva er formålet med unntaksspørsmål i LØFT?', opts:['Å finne årsaken til problemet','Å forestille seg en fremtid uten problemer','Å finne situasjoner der problemet var fraværende og forstørre det som fungerte','Å kartlegge motivasjon på en skala'], c:2, fb:'Unntaksspørsmål søker situasjoner der problemet var fraværende: «Kan du huske en gang det gikk bedre?» Målet er å finne og forstørre det som allerede fungerer (Pettersen & Løkke, 2017).' }
+];
+
+let answered = [];
+function buildQ() {
+  answered = new Array(Qs.length).fill(false);
+  document.getElementById('quiz-cont').innerHTML = Qs.map((q, i) =>
+    `<div class="quiz-q" id="qq${i}">
+      <div class="qt">${i+1}. ${q.q}</div>
+      <div class="qopts">${q.opts.map((o,j)=>`<button class="qopt" onclick="ansQ(${i},${j})" id="qo${i}_${j}">${o}</button>`).join('')}</div>
+      <div class="qfb" id="qf${i}"></div>
+    </div>`).join('');
+  document.getElementById('qreset').classList.remove('show');
+}
+function ansQ(qi, oi) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+  const q = Qs[qi];
+  document.querySelectorAll(`#qq${qi} .qopt`).forEach((b,j) => { b.disabled=true; if (j===q.c) b.classList.add('correct'); else if(j===oi) b.classList.add('wrong'); });
+  const fb = document.getElementById('qf'+qi);
+  fb.textContent = (oi===q.c?'✓ Riktig! ':'✗ Feil. ') + q.fb;
+  fb.classList.add('show', oi===q.c?'ok':'no');
+  if (answered.every(Boolean)) document.getElementById('qreset').classList.add('show');
+}
+
+// ─────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────
+buildCare();
+buildQTypes();
+buildTomm();
+buildStair();
+buildGruppe();
+buildSym();
+buildCompare();
+buildScenario();
+buildQ();
+selGphase(0);
+</script>
+
+<!-- ═══════ IND. vs. GRUPPE ═══════ -->
+<div id="sec-indgrupp" class="section">
+  <h2 class="sec-title">Individuell veiledning vs. gruppeveiledning</h2>
+  <p class="sec-intro">Klikk på et tema for å se hva som skiller og forener de to formene, og hva veilederen særlig må ta hensyn til.</p>
+
+  <div style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.08);padding:1rem;margin-bottom:1rem;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.8rem;">
+      <div style="background:var(--c1);color:white;border-radius:6px;padding:0.6rem 0.8rem;font-family:'Libre Baskerville',serif;font-size:0.88rem;font-weight:700;">Individuell veiledning</div>
+      <div style="background:var(--c3);color:white;border-radius:6px;padding:0.6rem 0.8rem;font-family:'Libre Baskerville',serif;font-size:0.88rem;font-weight:700;">Gruppeveiledning</div>
+    </div>
+    <ul class="dl" id="ig-compare-list"></ul>
+  </div>
+
+  <h2 class="sec-title" style="margin-top:1.2rem;">Fordeler og ulemper</h2>
+  <p class="sec-intro" style="margin-bottom:0.8rem;">Klikk for å lese mer om hver fordel og ulempe ved gruppeveiledning.</p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:1rem;" id="fu-grid"></div>
+
+  <h2 class="sec-title" style="margin-top:1.2rem;">Hva veilederen særlig må ta hensyn til i gruppe</h2>
+  <p class="sec-intro" style="margin-bottom:0.8rem;">Gruppeveiledning krever ekstra kompetanse utover individuell veiledning.</p>
+  <ul class="dl" style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.07);" id="ig-extra-list"></ul>
+
+  <p class="src">Killen (2007); Pettersen &amp; Løkke (2017); Tveiten (2019).</p>
+</div>
+
+<!-- ═══════ TRADISJONER ═══════ -->
+<div id="sec-tradisjoner" class="section">
+  <h2 class="sec-title">Veiledningstradisjoner og perspektiver</h2>
+  <p class="sec-intro">Klikk en tradisjon for å lese om dens grunnlag, menneskesyn og kobling til veiledningsmodeller.</p>
+
+  <div class="qtab-row" id="trad-tabs"></div>
+  <div id="trad-panels"></div>
+
+  <div style="margin-top:1.4rem;">
+    <h2 class="sec-title">Kierkegaards hjælpekunst</h2>
+    <p class="sec-intro" style="margin-bottom:0.8rem;">Et av de mest siterte prinsippene i veiledningslitteraturen.</p>
+    <div style="background:white;border-radius:8px;padding:1rem 1.2rem;box-shadow:0 1px 4px rgba(0,0,0,0.07);">
+      <ul class="dl" id="kk-list"></ul>
+    </div>
+  </div>
+
+  <div style="margin-top:1.4rem;">
+    <h2 class="sec-title">Batesons kommunikasjonsteori</h2>
+    <p class="sec-intro" style="margin-bottom:0.8rem;">Grunnlaget for Tomms spørsmålsmodell og symmetri/komplementaritet.</p>
+    <ul class="dl" style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.07);" id="bateson-list"></ul>
+  </div>
+
+  <p class="src">Tveiten (2019); Pettersen &amp; Løkke (2017); Handal, Hofgaard &amp; Lauvås (2016); Jensen &amp; Ulleberg (2019).</p>
+</div>
+
+<!-- ═══════ KONFLIKTHÅNDTERING ═══════ -->
+<div id="sec-konflikt" class="section">
+  <h2 class="sec-title">Konflikthåndtering i veiledning</h2>
+  <p class="sec-intro">Konflikter er en naturlig del av mellommenneskelig samspill og vil oppstå i alle veiledningsrelasjoner. Klikk for å utforske.</p>
+
+  <ul class="dl" style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.07);margin-bottom:1rem;" id="kf-hva-list"></ul>
+
+  <h2 class="sec-title" style="margin-top:1.2rem;">Konflikthåndtering i veiledning – fem spørsmål</h2>
+  <p class="sec-intro" style="margin-bottom:0.8rem;">Inspirert av «gjenopprettende rett» (Zehr, 2008), bearbeidet for veiledningskonteksten av Tveiten (2019).</p>
+  <div id="kf-steps"></div>
+
+  <h2 class="sec-title" style="margin-top:1.2rem;">Veilederens rolle ved konflikter</h2>
+  <p class="sec-intro" style="margin-bottom:0.8rem;">Hva kan og bør veilederen gjøre?</p>
+  <ul class="dl" style="background:white;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,0.07);" id="kf-rolle-list"></ul>
+
+  <p class="src">Tveiten (2019); Handal, Hofgaard &amp; Lauvås (2016).</p>
+</div>
+
+</body>
+</html>
